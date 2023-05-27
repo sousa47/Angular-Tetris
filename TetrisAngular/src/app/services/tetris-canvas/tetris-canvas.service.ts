@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root',
 })
-export class CanvasPiecesService {
+export class TetrisCanvasService {
   private _canvas: CanvasRenderingContext2D | null = null;
   private _canvasWidth: number = 0;
   private _canvasHeight: number = 0;
@@ -46,5 +46,9 @@ export class CanvasPiecesService {
     canvasGrid.stroke();
 
     return canvasGridElement;
+  }
+
+  get canvas(): CanvasRenderingContext2D | null {
+    return this._canvas;
   }
 }
