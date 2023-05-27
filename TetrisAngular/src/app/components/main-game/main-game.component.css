@@ -1,0 +1,18 @@
+.canvas-section {
+    margin: 0 auto;
+    border: 3px solid black;
+    height: 400px;
+    width: 200px;
+}
+
+/* The canvas of the game */
+.canvas-section > canvas{
+    position: absolute;
+    z-index: -1;
+}
+
+/* The canvas that has the grid  */
+canvas + canvas{
+    position: absolute;
+}
+
