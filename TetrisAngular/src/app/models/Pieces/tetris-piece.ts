@@ -1,10 +1,18 @@
 import { TetrisInput } from 'src/app/interfaces/tetris-input';
 
+export enum RotationDegree {
+  Degree0 = 0,
+  Degree90 = 90,
+  Degree180 = 180,
+  Degree270 = 270,
+}
+
 export abstract class TetrisPiece implements TetrisInput {
   movement: number = 20;
 
   protected _pieceHeight: number = 0;
   protected _pieceWidth: number = 0;
+  protected _rotationDegree: RotationDegree = RotationDegree.Degree0;
 
   constructor(
     protected _xCoordinates: number = 0,

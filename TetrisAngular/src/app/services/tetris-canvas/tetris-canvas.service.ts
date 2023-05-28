@@ -20,7 +20,7 @@ export class TetrisCanvasService {
    * Author: https://codereview.stackexchange.com/users/111698/deian
    */
   drawGrid(): Node {
-    const step = 20;
+    const step = this._canvas!.canvas.width / 10;
 
     var canvasGridElement = document.createElement('canvas');
     canvasGridElement.width = this._canvasWidth;

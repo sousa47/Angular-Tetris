@@ -1,8 +1,8 @@
 .canvas-section {
     margin: 0 auto;
     border: 3px solid black;
-    height: 400px;
-    width: 200px;
+    width: 400px;
+    height: 800px;
 }
 
 /* The canvas of the game */

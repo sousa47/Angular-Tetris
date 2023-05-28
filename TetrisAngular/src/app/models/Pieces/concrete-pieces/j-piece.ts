@@ -1,27 +1,16 @@
-import { TetrisPiece } from '../tetris-piece';
+import { TetrisPiece, RotationDegree } from '../tetris-piece';
 
 /**
- * Enumeration of rotation degrees for the JPiece.
- */
-enum RotationDegree {
-  Degree0 = 0,
-  Degree90 = 90,
-  Degree180 = 180,
-  Degree270 = 270,
-}
-
-/**
- * Represents a J-shaped Tetris piece.
+ * Represents the J-shaped Tetris piece.
+ * Extends the base TetrisPiece class.
  */
 export class JPiece extends TetrisPiece {
-  private _currentRotationDegree: RotationDegree = RotationDegree.Degree0;
-
   /**
-   * Constructs a new JPiece object.
-   * @param xCoordinates The initial x-coordinates of the piece.
-   * @param yCoordinates The initial y-coordinates of the piece.
-   * @param color The color of the piece. Defaults to 'blue'.
-   * @param canvas The canvas rendering context. Defaults to null.
+   * Creates a new J-shaped Tetris piece.
+   * @param {number} xCoordinates - The initial x-coordinate of the piece.
+   * @param {number} yCoordinates - The initial y-coordinate of the piece.
+   * @param {string} [color='blue'] - The color of the piece. Defaults to 'blue'.
+   * @param {CanvasRenderingContext2D | null} [canvas=null] - The canvas rendering context. Defaults to null.
    */
   constructor(
     xCoordinates: number,
@@ -30,13 +19,14 @@ export class JPiece extends TetrisPiece {
     canvas: CanvasRenderingContext2D | null = null
   ) {
     super(xCoordinates, yCoordinates, color, canvas);
+    this._rotationDegree = RotationDegree.Degree0;
   }
 
   /**
    * Draws the JPiece on the canvas.
-   * @param heightLength The height length of the piece.
-   * @param widthLength The width length of the piece.
-   * @returns The canvas rendering context after drawing the piece.
+   * @param {number} heightLength - The height length of the piece.
+   * @param {number} widthLength - The width length of the piece.
+   * @returns {CanvasRenderingContext2D} The rendering context of the canvas.
    */
   override drawPiece(
     heightLength: number,
@@ -46,7 +36,7 @@ export class JPiece extends TetrisPiece {
     this._pieceWidth = widthLength;
     this._canvas!.fillStyle = this._color;
 
-    switch (this._currentRotationDegree) {
+    switch (this._rotationDegree) {
       case RotationDegree.Degree0:
         this.drawJPieceAt0DegreeRotation();
         break;
@@ -68,7 +58,7 @@ export class JPiece extends TetrisPiece {
    * Clears the previous position of the JPiece on the canvas.
    */
   override clearPiecePreviousPosition(): void {
-    switch (this._currentRotationDegree) {
+    switch (this._rotationDegree) {
       case RotationDegree.Degree0:
         this.clearJPieceAt0DegreeRotation();
         break;
@@ -85,8 +75,8 @@ export class JPiece extends TetrisPiece {
   }
 
   /**
-   * Rotates the JPiece and updates its position.
-   * @returns The canvas rendering context after rotating the piece.
+   * Rotates the JPiece and redraws it on the canvas.
+   * @returns {CanvasRenderingContext2D} The rendering context of the canvas.
    */
   override rotatePiece(): CanvasRenderingContext2D {
     this.clearPiecePreviousPosition();
@@ -94,37 +84,32 @@ export class JPiece extends TetrisPiece {
     let newXCoordinates = this.xCoordinates;
     let newYCoordinates = this.yCoordinates;
 
-    switch (this._currentRotationDegree) {
+    switch (this._rotationDegree) {
       case RotationDegree.Degree0:
         newXCoordinates += this._pieceHeight / 2;
-        this._currentRotationDegree = RotationDegree.Degree90;
+        this._rotationDegree = RotationDegree.Degree90;
         break;
       case RotationDegree.Degree90:
         newXCoordinates -= this._pieceHeight / 3;
         newYCoordinates += this._pieceWidth / 2;
-        this._currentRotationDegree = RotationDegree.Degree180;
+        this._rotationDegree = RotationDegree.Degree180;
         break;
       case RotationDegree.Degree180:
         newYCoordinates -= this._pieceHeight / 2;
-        this._currentRotationDegree = RotationDegree.Degree270;
+        this._rotationDegree = RotationDegree.Degree270;
         break;
       case RotationDegree.Degree270:
-        newXCoordinates += this._pieceHeight / 3;
-        newYCoordinates -= this._pieceWidth / 2;
-        this._currentRotationDegree = RotationDegree.Degree0;
+        this._rotationDegree = RotationDegree.Degree0;
         break;
     }
 
-    this.xCoordinates = newXCoordinates;
-    this.yCoordinates = newYCoordinates;
-
-    this.drawPiece(this._pieceHeight, this._pieceWidth);
-
-    return this._canvas!;
+    this.setRotationNewCoordinates(newXCoordinates, newYCoordinates);
+    return this.drawPiece(this._pieceWidth, this._pieceHeight);
   }
 
-  // Private methods to draw and clear the JPiece for each rotation degree...
-
+  /**
+   * Draws the JPiece at 0-degree rotation.
+   */
   private drawJPieceAt0DegreeRotation(): void {
     this._canvas!.fillRect(
       this.xCoordinates,
@@ -174,6 +159,9 @@ export class JPiece extends TetrisPiece {
     this._canvas!.stroke();
   }
 
+  /**
+   * Clears the JPiece at 0-degree rotation.
+   */
   private clearJPieceAt0DegreeRotation(): void {
     this._canvas!.clearRect(
       this.xCoordinates - 1,
@@ -189,6 +177,9 @@ export class JPiece extends TetrisPiece {
     );
   }
 
+  /**
+   * Draws the JPiece at 90-degree rotation.
+   */
   private drawJPieceAt90DegreeRotation(): void {
     this._canvas!.fillRect(
       this.xCoordinates,
@@ -238,6 +229,9 @@ export class JPiece extends TetrisPiece {
     this._canvas!.stroke();
   }
 
+  /**
+   * Clears the JPiece at 90-degree rotation.
+   */
   private clearJPieceAt90DegreeRotation(): void {
     this._canvas!.clearRect(
       this.xCoordinates - 1,
@@ -253,6 +247,9 @@ export class JPiece extends TetrisPiece {
     );
   }
 
+  /**
+   * Draws the JPiece at 180-degree rotation.
+   */
   private drawJPieceAt180DegreeRotation(): void {
     this._canvas!.fillRect(
       this.xCoordinates,
@@ -302,6 +299,9 @@ export class JPiece extends TetrisPiece {
     this._canvas!.stroke();
   }
 
+  /**
+   * Clears the JPiece at 180-degree rotation.
+   */
   private clearJPieceAt180DegreeRotation(): void {
     this._canvas!.clearRect(
       this.xCoordinates - 1,
@@ -317,6 +317,9 @@ export class JPiece extends TetrisPiece {
     );
   }
 
+  /**
+   * Draws the JPiece at 270-degree rotation.
+   */
   private drawJPieceAt270DegreeRotation(): void {
     this._canvas!.fillRect(
       this.xCoordinates + this._pieceWidth / 2,
@@ -366,6 +369,9 @@ export class JPiece extends TetrisPiece {
     this._canvas!.stroke();
   }
 
+  /**
+   * Clears the JPiece at 270-degree rotation.
+   */
   private clearJPieceAt270DegreeRotation(): void {
     this._canvas!.clearRect(
       this.xCoordinates + this._pieceWidth / 2 - 1,
