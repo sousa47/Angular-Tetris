@@ -4,6 +4,7 @@ export abstract class TetrisPiece implements TetrisInput {
   movement: number = 0;
 
   protected _pieceHeight: number = 0;
+  protected _pieceWidth: number = 0;
 
   constructor(
     protected _xCoordinates: number = 0,
@@ -16,11 +17,11 @@ export abstract class TetrisPiece implements TetrisInput {
     this._canvas!.strokeStyle = 'black';
   }
 
-  movePieceDown(allTheWay: boolean = false): CanvasRenderingContext2D {
+  movePieceDown(hardDrop: boolean = false): CanvasRenderingContext2D {
     // TODO: Check if the piece can move down (if there is a piece below it)
     return this.movePiece(
       this._xCoordinates,
-      allTheWay
+      hardDrop
         ? this._canvas!.canvas.height - this._pieceHeight
         : this._yCoordinates + this.movement
     );
@@ -52,17 +53,12 @@ export abstract class TetrisPiece implements TetrisInput {
     yCoordinates: number
   ): boolean;
 
+
   rotatePieceClockwise(): CanvasRenderingContext2D {
-    throw new Error('Method not implemented.');
+    return this.rotatePiece();
   }
 
-  rotatePieceCounterClockwise(): CanvasRenderingContext2D {
-    throw new Error('Method not implemented.');
-  }
-
-  // rotatePiece(clockwise: bool = true): CanvasRenderingContext2D {
-  // rotationIsPossible(clockwise: bool = true): boolean {
-
+  abstract rotatePiece(): CanvasRenderingContext2D;
 
   clearCanvas(): void {
     this._canvas!.clearRect(
@@ -73,7 +69,7 @@ export abstract class TetrisPiece implements TetrisInput {
     );
   }
 
-  //clearPiecePreviousPosition(): void {
+  abstract clearPiecePreviousPosition(): void;
 
   get xCoordinates(): number {
     return this._xCoordinates;
@@ -89,130 +85,5 @@ export abstract class TetrisPiece implements TetrisInput {
 
   set yCoordinates(yCoordinates: number) {
     this._yCoordinates = yCoordinates;
-  }
-}
-
-export class TPiece extends TetrisPiece {
-  override moveIsPossible(): boolean {
-    throw new Error('Method not implemented.');
-  }
-  constructor(
-    xCoordinates: number,
-    yCoordinates: number,
-    color: string,
-    canvas: CanvasRenderingContext2D | null = null
-  ) {
-    super(xCoordinates, yCoordinates, color, canvas);
-  }
-
-  override drawPiece(): CanvasRenderingContext2D {
-    throw new Error('Method not implemented.');
-  }
-
-  override movePiece(
-    xCoordinates: number,
-    yCoordinates: number
-  ): CanvasRenderingContext2D {
-    throw new Error('Method not implemented.');
-  }
-}
-
-export class LPiece extends TetrisPiece {
-  override moveIsPossible(): boolean {
-    throw new Error('Method not implemented.');
-  }
-  constructor(
-    xCoordinates: number,
-    yCoordinates: number,
-    color: string,
-    canvas: CanvasRenderingContext2D | null = null
-  ) {
-    super(xCoordinates, yCoordinates, color, canvas);
-  }
-
-  override drawPiece(): CanvasRenderingContext2D {
-    throw new Error('Method not implemented.');
-  }
-
-  override movePiece(
-    xCoordinates: number,
-    yCoordinates: number
-  ): CanvasRenderingContext2D {
-    throw new Error('Method not implemented.');
-  }
-}
-
-export class JPiece extends TetrisPiece {
-  override moveIsPossible(): boolean {
-    throw new Error('Method not implemented.');
-  }
-  constructor(
-    xCoordinates: number,
-    yCoordinates: number,
-    color: string,
-    canvas: CanvasRenderingContext2D | null = null
-  ) {
-    super(xCoordinates, yCoordinates, color, canvas);
-  }
-
-  override drawPiece(): CanvasRenderingContext2D {
-    throw new Error('Method not implemented.');
-  }
-
-  override movePiece(
-    xCoordinates: number,
-    yCoordinates: number
-  ): CanvasRenderingContext2D {
-    throw new Error('Method not implemented.');
-  }
-}
-
-export class SPiece extends TetrisPiece {
-  override moveIsPossible(): boolean {
-    throw new Error('Method not implemented.');
-  }
-  constructor(
-    xCoordinates: number,
-    yCoordinates: number,
-    color: string,
-    canvas: CanvasRenderingContext2D | null = null
-  ) {
-    super(xCoordinates, yCoordinates, color, canvas);
-  }
-
-  override drawPiece(): CanvasRenderingContext2D {
-    throw new Error('Method not implemented.');
-  }
-
-  override movePiece(
-    xCoordinates: number,
-    yCoordinates: number
-  ): CanvasRenderingContext2D {
-    throw new Error('Method not implemented.');
-  }
-}
-
-export class ZPiece extends TetrisPiece {
-  override moveIsPossible(): boolean {
-    throw new Error('Method not implemented.');
-  }
-  constructor(
-    xCoordinates: number,
-    yCoordinates: number,
-    color: string,
-    canvas: CanvasRenderingContext2D | null = null
-  ) {
-    super(xCoordinates, yCoordinates, color, canvas);
-  }
-
-  override drawPiece(): CanvasRenderingContext2D {
-    throw new Error('Method not implemented.');
-  }
-
-  override movePiece(
-    xCoordinates: number,
-    yCoordinates: number
-  ): CanvasRenderingContext2D {
-    throw new Error('Method not implemented.');
   }
 }

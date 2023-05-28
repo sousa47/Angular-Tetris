@@ -1,8 +1,11 @@
 import { TetrisPiece } from '../tetris-piece';
 
-export class SquarePiece extends TetrisPiece {
+export class OPiece extends TetrisPiece {
+  override clearPiecePreviousPosition(): void {
+    throw new Error('Method not implemented.');
+  }
   private _sideLength?: number = 0;
-  private _squareColor: string = 'red';
+  private _pieceColor: string = 'yellow';
 
   constructor(
     xCoordinates: number,
@@ -11,7 +14,7 @@ export class SquarePiece extends TetrisPiece {
     canvas: CanvasRenderingContext2D | null = null
   ) {
     super(xCoordinates, yCoordinates, color, canvas);
-    this._squareColor = color;
+    this._pieceColor = color;
   }
 
   override drawPiece(sideLength: number): CanvasRenderingContext2D {
@@ -21,10 +24,11 @@ export class SquarePiece extends TetrisPiece {
       sideLength,
       sideLength
     );
-    
-    this._canvas!.fillStyle = this._squareColor;
+
+    this._canvas!.fillStyle = this._pieceColor;
     this._sideLength = sideLength;
     this._pieceHeight = this._sideLength;
+    this._pieceWidth = this._sideLength;
 
     this.drawBorderAndInnerBorder!();
 
@@ -71,7 +75,7 @@ export class SquarePiece extends TetrisPiece {
   ): CanvasRenderingContext2D {
     if (!this.moveIsPossible(xCoordinates, yCoordinates)) return this._canvas!;
 
-    this.clearCanvas();
+    this.clearPiecePreviousPosition();
     this._xCoordinates = xCoordinates;
     this._yCoordinates = yCoordinates;
     this.drawPiece(this._sideLength!);
@@ -80,13 +84,24 @@ export class SquarePiece extends TetrisPiece {
 
   override moveIsPossible(xCoordinates: number, yCoordinates: number): boolean {
     var check = true;
-    if (xCoordinates < 0) check = false;
-    if (xCoordinates + this._sideLength! > this._canvas!.canvas.width)
+
+    if (
+      xCoordinates < 0 ||
+      xCoordinates + this._sideLength! > this._canvas!.canvas.width
+    )
       check = false;
-    if (yCoordinates < 0) check = false;
-    if (yCoordinates + this._sideLength! > this._canvas!.canvas.height)
+
+    if (
+      yCoordinates < 0 ||
+      yCoordinates + this._sideLength! > this._canvas!.canvas.height
+    )
       check = false;
 
     return check;
+  }
+
+  override rotatePiece(): CanvasRenderingContext2D {
+    // Since this is a square, it doesn't trully rotate.
+    return this._canvas!;
   }
 }

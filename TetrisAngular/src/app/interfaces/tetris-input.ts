@@ -1,8 +1,7 @@
 export interface TetrisInput {
     movement: number;
     rotatePieceClockwise(): void;
-    rotatePieceCounterClockwise(): void;
-    movePieceDown(allTheWay: boolean): void;
+    movePieceDown(hardDrop: boolean): void;
     movePieceLeft(): void;
     movePieceRight(): void;
 }

@@ -35,8 +35,12 @@ export class MainGameComponent {
     this._canvas = this._currentPiece!.movePieceDown() || null;
   }
 
-  movePieceDownAllTheWay(): void {
+  movePieceDownhardDrop(): void {
     this._canvas = this._currentPiece!.movePieceDown(true) || null;
+  }
+
+  rotatePiece(): void {
+    this._canvas = this._currentPiece!.rotatePiece() || null;
   }
 
   getRandomPiece(): void {
