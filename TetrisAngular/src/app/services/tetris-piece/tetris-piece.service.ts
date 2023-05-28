@@ -12,7 +12,7 @@ import { TetrisPiece } from 'src/app/models/Pieces/tetris-piece';
   providedIn: 'root',
 })
 export class TetrisPieceService {
-  private  _tetrisPieces: TetrisPiece[] = [];
+  private _tetrisPieces: TetrisPiece[] = [];
   private _canvas: CanvasRenderingContext2D | null = null;
   private _gridUnit = 20;
   private _xSpawn = 0;
@@ -29,12 +29,12 @@ export class TetrisPieceService {
 
   get randomPiece(): TetrisPiece {
     // return this._tetrisPieces[(this._tetrisPieces.length * Math.random()) | 0];
-    return this._tetrisPieces[1];
+    return this._tetrisPieces[4];
   }
 
   get randomPieceAndPieceDrawing(): [TetrisPiece, CanvasRenderingContext2D] {
     if (this._tetrisPieces.length === 0) this.generatePieces();
-  
+
     var randomPiece = this.randomPiece;
     randomPiece.clearCanvas();
     return [randomPiece, this.getPieceDrawing(randomPiece)];
@@ -57,13 +57,16 @@ export class TetrisPieceService {
       case 'ZPiece':
         return this.zPieceDrawing;
       default:
-        throw new Error('Piece is not a valid piece, couldn\'t get drawing');
+        throw new Error("Piece is not a valid piece, couldn't get drawing");
     }
   }
 
   get oPieceDrawing(): CanvasRenderingContext2D {
     this.createOPiece();
-    return this._tetrisPieces[0].drawPiece(this._gridUnit * 2);
+    return this._tetrisPieces[0].drawPiece(
+      this._gridUnit * 2,
+      this._gridUnit * 2
+    );
   }
 
   get oPiece(): TetrisPiece {
@@ -76,8 +79,7 @@ export class TetrisPieceService {
     var numberOfSections = 4;
     return this._tetrisPieces[1].drawPiece(
       this._gridUnit * numberOfSections,
-      this._gridUnit,
-      numberOfSections
+      this._gridUnit
     );
   }
 
@@ -108,7 +110,10 @@ export class TetrisPieceService {
 
   get jPieceDrawing(): CanvasRenderingContext2D {
     this.createJPiece();
-    return this._tetrisPieces[4].drawPiece(this._gridUnit, this._gridUnit * 3);
+    return this._tetrisPieces[4].drawPiece(
+      this._gridUnit * 2,
+      this._gridUnit * 3
+    );
   }
 
   get jPiece(): TetrisPiece {
@@ -147,49 +152,66 @@ export class TetrisPieceService {
   }
 
   private createOPiece(): void {
-    if(this.checkIfCanvasNotExists()) throw new Error('Canvas does not exist, set it first');
+    if (this.checkIfCanvasNotExists())
+      throw new Error('Canvas does not exist, set it first');
     var squarePiece = new OPiece(this._xSpawn, 0, 'yellow', this._canvas);
     squarePiece.movement = this._gridUnit;
     this._tetrisPieces[0] = squarePiece;
   }
 
   private createIPiece(): void {
-    if(this.checkIfCanvasNotExists()) throw new Error('Canvas does not exist, set it first');
+    if (this.checkIfCanvasNotExists())
+      throw new Error('Canvas does not exist, set it first');
     var linePiece = new IPiece(this._xSpawn, 0, 'lightblue', this._canvas);
     linePiece.movement = this._gridUnit;
     this._tetrisPieces[1] = linePiece;
   }
 
   private createTPiece(): void {
-    if(this.checkIfCanvasNotExists()) throw new Error('Canvas does not exist, set it first');
+    if (this.checkIfCanvasNotExists())
+      throw new Error('Canvas does not exist, set it first');
     var tPiece = new TPiece(this._xSpawn, 0, 'purple', this._canvas);
     tPiece.movement = this._gridUnit;
     this._tetrisPieces[2] = tPiece;
   }
 
   private createLPiece(): void {
-    if(this.checkIfCanvasNotExists()) throw new Error('Canvas does not exist, set it first');
+    if (this.checkIfCanvasNotExists())
+      throw new Error('Canvas does not exist, set it first');
     var lPiece = new LPiece(this._xSpawn, 0, 'orange', this._canvas);
     lPiece.movement = this._gridUnit;
     this._tetrisPieces[3] = lPiece;
   }
 
   private createJPiece(): void {
-    if(this.checkIfCanvasNotExists()) throw new Error('Canvas does not exist, set it first');
-    var jPiece = new JPiece(this._xSpawn, 0, 'blue', this._canvas);
+    if (this.checkIfCanvasNotExists())
+      throw new Error('Canvas does not exist, set it first');
+    var jPiece = new JPiece(
+      this._xSpawn - this._gridUnit,
+      0,
+      'blue',
+      this._canvas
+    );
     jPiece.movement = this._gridUnit;
     this._tetrisPieces[4] = jPiece;
   }
 
   private createSPiece(): void {
-    if(this.checkIfCanvasNotExists()) throw new Error('Canvas does not exist, set it first');
-    var sPiece = new SPiece(this._xSpawn, 0, 'green', this._canvas);
+    if (this.checkIfCanvasNotExists())
+      throw new Error('Canvas does not exist, set it first');
+    var sPiece = new SPiece(
+      this._xSpawn - this._gridUnit,
+      0,
+      'green',
+      this._canvas
+    );
     sPiece.movement = this._gridUnit;
     this._tetrisPieces[5] = sPiece;
   }
 
   private createZPiece(): void {
-    if(this.checkIfCanvasNotExists()) throw new Error('Canvas does not exist, set it first');
+    if (this.checkIfCanvasNotExists())
+      throw new Error('Canvas does not exist, set it first');
     var zPiece = new ZPiece(this._xSpawn, 0, 'red', this._canvas);
     zPiece.movement = this._gridUnit;
     this._tetrisPieces[6] = zPiece;

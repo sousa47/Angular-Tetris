@@ -1,194 +1,383 @@
 import { TetrisPiece } from '../tetris-piece';
 
+/**
+ * Enumeration of rotation degrees for the JPiece.
+ */
+enum RotationDegree {
+  Degree0 = 0,
+  Degree90 = 90,
+  Degree180 = 180,
+  Degree270 = 270,
+}
+
+/**
+ * Represents a J-shaped Tetris piece.
+ */
 export class JPiece extends TetrisPiece {
-  override clearPiecePreviousPosition(): void {
-    throw new Error('Method not implemented.');
-  }
-  override rotatePiece(): CanvasRenderingContext2D {
-    throw new Error('Method not implemented.');
-  }
-  private _heightLength?: number = 0;
-  private _widthLength?: number = 0;
-  private _pieceColor: string = 'blue';
+  private _currentRotationDegree: RotationDegree = RotationDegree.Degree0;
 
-  // Orientation is based of the extreme piece.
-  private _pieceOrientation: 'up' | 'right' | 'down' | 'left' = 'up';
-
+  /**
+   * Constructs a new JPiece object.
+   * @param xCoordinates The initial x-coordinates of the piece.
+   * @param yCoordinates The initial y-coordinates of the piece.
+   * @param color The color of the piece. Defaults to 'blue'.
+   * @param canvas The canvas rendering context. Defaults to null.
+   */
   constructor(
     xCoordinates: number,
     yCoordinates: number,
-    color: string,
+    color: string = 'blue',
     canvas: CanvasRenderingContext2D | null = null
   ) {
     super(xCoordinates, yCoordinates, color, canvas);
-    this._pieceColor = color;
   }
 
+  /**
+   * Draws the JPiece on the canvas.
+   * @param heightLength The height length of the piece.
+   * @param widthLength The width length of the piece.
+   * @returns The canvas rendering context after drawing the piece.
+   */
   override drawPiece(
     heightLength: number,
     widthLength: number
   ): CanvasRenderingContext2D {
-    this._heightLength = heightLength;
-    this._widthLength = widthLength;
     this._pieceHeight = heightLength;
-    this._canvas!.fillStyle = this._pieceColor;
+    this._pieceWidth = widthLength;
+    this._canvas!.fillStyle = this._color;
 
-    this._canvas!.fillRect(
-      this._xCoordinates,
-      this._yCoordinates + heightLength,
-      widthLength,
-      heightLength
-    );
-
-    // adding the above piece in the left side
-    this._canvas!.fillRect(
-      this._xCoordinates,
-      this._yCoordinates,
-      widthLength / 3,
-      heightLength
-    );
-
-    this.drawBorderAndInnerBorder();
+    switch (this._currentRotationDegree) {
+      case RotationDegree.Degree0:
+        this.drawJPieceAt0DegreeRotation();
+        break;
+      case RotationDegree.Degree90:
+        this.drawJPieceAt90DegreeRotation();
+        break;
+      case RotationDegree.Degree180:
+        this.drawJPieceAt180DegreeRotation();
+        break;
+      case RotationDegree.Degree270:
+        this.drawJPieceAt270DegreeRotation();
+        break;
+    }
 
     return this._canvas!;
   }
 
-  private drawBorderAndInnerBorder(): void {
-    this._canvas!.strokeRect(
-      this._xCoordinates,
-      this._yCoordinates + this._heightLength!,
-      this._widthLength!,
-      this._heightLength!
-    );
-
-    this._canvas!.strokeRect(
-      this._xCoordinates,
-      this._yCoordinates,
-      this._widthLength! / 3,
-      this._heightLength!
-    );
-
-    this._canvas!.strokeRect(
-      this._xCoordinates + this._widthLength! * (1 / 3),
-      this._yCoordinates + this._heightLength!,
-      this._widthLength! / 3,
-      this._heightLength!
-    );
-
-    this._canvas!.strokeRect(
-      this._xCoordinates + this._widthLength! * (2 / 3),
-      this._yCoordinates + this._heightLength!,
-      this._widthLength! / 3,
-      this._heightLength!
-    );
+  /**
+   * Clears the previous position of the JPiece on the canvas.
+   */
+  override clearPiecePreviousPosition(): void {
+    switch (this._currentRotationDegree) {
+      case RotationDegree.Degree0:
+        this.clearJPieceAt0DegreeRotation();
+        break;
+      case RotationDegree.Degree90:
+        this.clearJPieceAt90DegreeRotation();
+        break;
+      case RotationDegree.Degree180:
+        this.clearJPieceAt180DegreeRotation();
+        break;
+      case RotationDegree.Degree270:
+        this.clearJPieceAt270DegreeRotation();
+        break;
+    }
   }
 
-  override movePiece(
-    xCoordinates: number,
-    yCoordinates: number
-  ): CanvasRenderingContext2D {
-    if (!this.moveIsPossible(xCoordinates, yCoordinates)) return this._canvas!;
+  /**
+   * Rotates the JPiece and updates its position.
+   * @returns The canvas rendering context after rotating the piece.
+   */
+  override rotatePiece(): CanvasRenderingContext2D {
+    this.clearPiecePreviousPosition();
 
-    this.clearCanvas();
-    this._xCoordinates = xCoordinates;
-    this._yCoordinates = yCoordinates;
-    this.drawPiece(this._heightLength!, this._widthLength!);
+    let newXCoordinates = this.xCoordinates;
+    let newYCoordinates = this.yCoordinates;
+
+    switch (this._currentRotationDegree) {
+      case RotationDegree.Degree0:
+        newXCoordinates += this._pieceHeight / 2;
+        this._currentRotationDegree = RotationDegree.Degree90;
+        break;
+      case RotationDegree.Degree90:
+        newXCoordinates -= this._pieceHeight / 3;
+        newYCoordinates += this._pieceWidth / 2;
+        this._currentRotationDegree = RotationDegree.Degree180;
+        break;
+      case RotationDegree.Degree180:
+        newYCoordinates -= this._pieceHeight / 2;
+        this._currentRotationDegree = RotationDegree.Degree270;
+        break;
+      case RotationDegree.Degree270:
+        newXCoordinates += this._pieceHeight / 3;
+        newYCoordinates -= this._pieceWidth / 2;
+        this._currentRotationDegree = RotationDegree.Degree0;
+        break;
+    }
+
+    this.xCoordinates = newXCoordinates;
+    this.yCoordinates = newYCoordinates;
+
+    this.drawPiece(this._pieceHeight, this._pieceWidth);
+
     return this._canvas!;
   }
 
-  override moveIsPossible(xCoordinates: number, yCoordinates: number): boolean {
-    if (this._pieceOrientation === 'up')
-      return this.moveIsPossibleOrientationUp(xCoordinates, yCoordinates);
-    if (this._pieceOrientation === 'right')
-      return this.moveIsPossibleOrientationRight(xCoordinates, yCoordinates);
-    if (this._pieceOrientation === 'down')
-      return this.moveIsPossibleOrientationDown(xCoordinates, yCoordinates);
-    if (this._pieceOrientation === 'left')
-      return this.moveIsPossibleOrientationLeft(xCoordinates, yCoordinates);
-    return false;
+  // Private methods to draw and clear the JPiece for each rotation degree...
+
+  private drawJPieceAt0DegreeRotation(): void {
+    this._canvas!.fillRect(
+      this.xCoordinates,
+      this.yCoordinates + this._pieceHeight / 2,
+      this._pieceWidth,
+      this._pieceHeight / 2
+    );
+
+    this._canvas!.strokeRect(
+      this.xCoordinates,
+      this.yCoordinates + this._pieceHeight / 2,
+      this._pieceWidth,
+      this._pieceHeight / 2
+    );
+
+    this._canvas!.fillRect(
+      this.xCoordinates,
+      this.yCoordinates,
+      this._pieceWidth / 3,
+      this._pieceHeight / 2
+    );
+
+    this._canvas!.strokeRect(
+      this.xCoordinates,
+      this.yCoordinates,
+      this._pieceWidth / 3,
+      this._pieceHeight / 2
+    );
+
+    this._canvas!.beginPath();
+    this._canvas!.moveTo(
+      this.xCoordinates + this._pieceWidth / 3,
+      this.yCoordinates + this._pieceHeight / 2
+    );
+    this._canvas!.lineTo(
+      this.xCoordinates + this._pieceWidth / 3,
+      this.yCoordinates + this._pieceHeight
+    );
+    this._canvas!.moveTo(
+      this.xCoordinates + this._pieceWidth * (2 / 3),
+      this.yCoordinates + this._pieceHeight / 2
+    );
+    this._canvas!.lineTo(
+      this.xCoordinates + this._pieceWidth * (2 / 3),
+      this.yCoordinates + this._pieceHeight
+    );
+    this._canvas!.stroke();
   }
 
-  private moveIsPossibleOrientationUp(
-    xCoordinates: number,
-    yCoordinates: number
-  ): boolean {
-    var check = true;
-
-    if (
-      xCoordinates < 0 ||
-      xCoordinates > this._canvas!.canvas.width - this._widthLength!
-    )
-      check = false;
-
-    if (
-      yCoordinates < 0 ||
-      yCoordinates > this._canvas!.canvas.height - this._heightLength! * 2
-    )
-      check = false;
-
-    return check;
+  private clearJPieceAt0DegreeRotation(): void {
+    this._canvas!.clearRect(
+      this.xCoordinates - 1,
+      this.yCoordinates + this._pieceHeight / 2 - 1,
+      this._pieceWidth + 2,
+      this._pieceHeight / 2 + 2
+    );
+    this._canvas!.clearRect(
+      this.xCoordinates - 1,
+      this.yCoordinates - 1,
+      this._pieceWidth / 3 + 2,
+      this._pieceHeight / 2 + 2
+    );
   }
 
-  private moveIsPossibleOrientationRight(
-    xCoordinates: number,
-    yCoordinates: number
-  ): boolean {
-    var check = true;
+  private drawJPieceAt90DegreeRotation(): void {
+    this._canvas!.fillRect(
+      this.xCoordinates,
+      this.yCoordinates,
+      this._pieceWidth / 2,
+      this._pieceHeight
+    );
 
-    if (
-      xCoordinates < 0 ||
-      xCoordinates > this._canvas!.canvas.width - this._heightLength! * 2
-    )
-      check = false;
+    this._canvas!.strokeRect(
+      this.xCoordinates,
+      this.yCoordinates,
+      this._pieceWidth / 2,
+      this._pieceHeight
+    );
 
-    if (
-      yCoordinates < 0 ||
-      yCoordinates > this._canvas!.canvas.height - this._widthLength!
-    )
-      check = false;
+    this._canvas!.fillRect(
+      this.xCoordinates + this._pieceWidth / 2,
+      this.yCoordinates,
+      this._pieceWidth / 2,
+      this._pieceHeight / 3
+    );
 
-    return check;
+    this._canvas!.strokeRect(
+      this.xCoordinates + this._pieceWidth / 2,
+      this.yCoordinates,
+      this._pieceWidth / 2,
+      this._pieceHeight / 3
+    );
+
+    this._canvas!.beginPath();
+    this._canvas!.moveTo(
+      this.xCoordinates,
+      this.yCoordinates + this._pieceHeight / 3
+    );
+    this._canvas!.lineTo(
+      this.xCoordinates + this._pieceWidth / 2,
+      this.yCoordinates + this._pieceHeight / 3
+    );
+    this._canvas!.moveTo(
+      this.xCoordinates,
+      this.yCoordinates + this._pieceHeight * (2 / 3)
+    );
+    this._canvas!.lineTo(
+      this.xCoordinates + this._pieceWidth / 2,
+      this.yCoordinates + this._pieceHeight * (2 / 3)
+    );
+    this._canvas!.stroke();
   }
 
-  private moveIsPossibleOrientationDown(
-    xCoordinates: number,
-    yCoordinates: number
-  ): boolean {
-    var check = true;
-
-    if (
-      xCoordinates < 0 ||
-      xCoordinates > this._canvas!.canvas.width - this._widthLength!
-    )
-      check = false;
-
-    if (
-      yCoordinates < 0 ||
-      yCoordinates > this._canvas!.canvas.height - this._heightLength! * 2
-    )
-      check = false;
-
-    return check;
+  private clearJPieceAt90DegreeRotation(): void {
+    this._canvas!.clearRect(
+      this.xCoordinates - 1,
+      this.yCoordinates - 1,
+      this._pieceWidth / 2 + 2,
+      this._pieceHeight + 2
+    );
+    this._canvas!.clearRect(
+      this.xCoordinates + this._pieceWidth / 2 - 1,
+      this.yCoordinates - 1,
+      this._pieceWidth / 2 + 2,
+      this._pieceHeight / 3 + 2
+    );
   }
 
-  private moveIsPossibleOrientationLeft(
-    xCoordinates: number,
-    yCoordinates: number
-  ): boolean {
-    var check = true;
+  private drawJPieceAt180DegreeRotation(): void {
+    this._canvas!.fillRect(
+      this.xCoordinates,
+      this.yCoordinates,
+      this._pieceWidth,
+      this._pieceHeight / 2
+    );
 
-    if (
-      xCoordinates < this._heightLength! * 2 ||
-      xCoordinates > this._canvas!.canvas.width
-    )
-      check = false;
+    this._canvas!.strokeRect(
+      this.xCoordinates,
+      this.yCoordinates,
+      this._pieceWidth,
+      this._pieceHeight / 2
+    );
 
-    if (
-      yCoordinates < 0 ||
-      yCoordinates > this._canvas!.canvas.height - this._widthLength!
-    )
-      check = false;
+    this._canvas!.fillRect(
+      this.xCoordinates + this._pieceWidth * (2 / 3),
+      this.yCoordinates + this._pieceHeight / 2,
+      this._pieceWidth / 3,
+      this._pieceHeight / 2
+    );
 
-    return check;
+    this._canvas!.strokeRect(
+      this.xCoordinates + this._pieceWidth * (2 / 3),
+      this.yCoordinates + this._pieceHeight / 2,
+      this._pieceWidth / 3,
+      this._pieceHeight / 2
+    );
+
+    this._canvas!.beginPath();
+    this._canvas!.moveTo(
+      this.xCoordinates + this._pieceWidth / 3,
+      this.yCoordinates
+    );
+    this._canvas!.lineTo(
+      this.xCoordinates + this._pieceWidth / 3,
+      this.yCoordinates + this._pieceHeight / 2
+    );
+    this._canvas!.moveTo(
+      this.xCoordinates + this._pieceWidth * (2 / 3),
+      this.yCoordinates
+    );
+    this._canvas!.lineTo(
+      this.xCoordinates + this._pieceWidth * (2 / 3),
+      this.yCoordinates + this._pieceHeight / 2
+    );
+    this._canvas!.stroke();
+  }
+
+  private clearJPieceAt180DegreeRotation(): void {
+    this._canvas!.clearRect(
+      this.xCoordinates - 1,
+      this.yCoordinates - 1,
+      this._pieceWidth + 2,
+      this._pieceHeight / 2 + 2
+    );
+    this._canvas!.clearRect(
+      this.xCoordinates + this._pieceWidth * (2 / 3) - 1,
+      this.yCoordinates + this._pieceHeight / 2 - 1,
+      this._pieceWidth / 3 + 2,
+      this._pieceHeight / 2 + 2
+    );
+  }
+
+  private drawJPieceAt270DegreeRotation(): void {
+    this._canvas!.fillRect(
+      this.xCoordinates + this._pieceWidth / 2,
+      this.yCoordinates,
+      this._pieceWidth / 2,
+      this._pieceHeight
+    );
+
+    this._canvas!.strokeRect(
+      this.xCoordinates + this._pieceWidth / 2,
+      this.yCoordinates,
+      this._pieceWidth / 2,
+      this._pieceHeight
+    );
+
+    this._canvas!.fillRect(
+      this.xCoordinates,
+      this.yCoordinates + this._pieceHeight * (2 / 3),
+      this._pieceWidth / 2,
+      this._pieceHeight / 3
+    );
+
+    this._canvas!.strokeRect(
+      this.xCoordinates,
+      this.yCoordinates + this._pieceHeight * (2 / 3),
+      this._pieceWidth / 2,
+      this._pieceHeight / 3
+    );
+
+    this._canvas!.beginPath();
+    this._canvas!.moveTo(
+      this.xCoordinates + this._pieceWidth / 2,
+      this.yCoordinates + this._pieceHeight / 3
+    );
+    this._canvas!.lineTo(
+      this.xCoordinates + this._pieceWidth,
+      this.yCoordinates + this._pieceHeight / 3
+    );
+    this._canvas!.moveTo(
+      this.xCoordinates + this._pieceWidth / 2,
+      this.yCoordinates + this._pieceHeight * (2 / 3)
+    );
+    this._canvas!.lineTo(
+      this.xCoordinates + this._pieceWidth,
+      this.yCoordinates + this._pieceHeight * (2 / 3)
+    );
+    this._canvas!.stroke();
+  }
+
+  private clearJPieceAt270DegreeRotation(): void {
+    this._canvas!.clearRect(
+      this.xCoordinates + this._pieceWidth / 2 - 1,
+      this.yCoordinates - 1,
+      this._pieceWidth / 2 + 2,
+      this._pieceHeight + 2
+    );
+    this._canvas!.clearRect(
+      this.xCoordinates - 1,
+      this.yCoordinates + this._pieceHeight * (2 / 3) - 1,
+      this._pieceWidth / 2 + 2,
+      this._pieceHeight / 3 + 2
+    );
   }
 }

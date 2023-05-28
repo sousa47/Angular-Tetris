@@ -1,7 +1,7 @@
 import { TetrisInput } from 'src/app/interfaces/tetris-input';
 
 export abstract class TetrisPiece implements TetrisInput {
-  movement: number = 0;
+  movement: number = 20;
 
   protected _pieceHeight: number = 0;
   protected _pieceWidth: number = 0;
@@ -16,6 +16,11 @@ export abstract class TetrisPiece implements TetrisInput {
     this._canvas!.lineWidth = 2;
     this._canvas!.strokeStyle = 'black';
   }
+
+  abstract drawPiece(
+    heightLength: number,
+    widthLength: number
+  ): CanvasRenderingContext2D;
 
   movePieceDown(hardDrop: boolean = false): CanvasRenderingContext2D {
     // TODO: Check if the piece can move down (if there is a piece below it)
@@ -41,24 +46,64 @@ export abstract class TetrisPiece implements TetrisInput {
     );
   }
 
-  abstract drawPiece(...args: any): CanvasRenderingContext2D;
-
-  abstract movePiece(
+  movePiece(
     xCoordinates: number,
     yCoordinates: number
-  ): CanvasRenderingContext2D;
+  ): CanvasRenderingContext2D {
+    if (!this.moveIsPossible(xCoordinates, yCoordinates)) return this._canvas!;
 
-  abstract moveIsPossible(
-    xCoordinates: number,
-    yCoordinates: number
-  ): boolean;
+    this.clearPiecePreviousPosition();
+    this.xCoordinates = xCoordinates;
+    this.yCoordinates = yCoordinates;
+    this.drawPiece(this._pieceHeight, this._pieceWidth);
 
+    return this._canvas!;
+  }
+
+  /**
+   * Checks if moving the I-shaped Tetris piece to the specified coordinates is possible.
+   * @param xCoordinates - The x-coordinate to check.
+   * @param yCoordinates - The y-coordinate to check.
+   * @returns True if the move is possible, false otherwise.
+   */
+  moveIsPossible(xCoordinates: number, yCoordinates: number): boolean {
+    return (
+      xCoordinates >= 0 &&
+      xCoordinates <= this._canvas!.canvas.width - this._pieceWidth &&
+      yCoordinates >= 0 &&
+      yCoordinates <= this._canvas!.canvas.height - this._pieceHeight
+    );
+  }
 
   rotatePieceClockwise(): CanvasRenderingContext2D {
     return this.rotatePiece();
   }
 
   abstract rotatePiece(): CanvasRenderingContext2D;
+
+  /**
+   * Adjusts the new rotation coordinates to ensure they are within the canvas boundaries.
+   * @param newXCoordinates - The new x-coordinate after rotation.
+   * @param newYCoordinates - The new y-coordinate after rotation.
+   */
+  setRotationNewCoordinates(
+    newXCoordinates: number,
+    newYCoordinates: number
+  ): void {
+    const canvasWidth = this._canvas!.canvas.width;
+    const canvasHeight = this._canvas!.canvas.height;
+
+    if (newXCoordinates < 0) newXCoordinates = 0;
+    if (newXCoordinates > canvasWidth - this._pieceHeight)
+      newXCoordinates = canvasWidth - this._pieceHeight;
+
+    if (newYCoordinates < 0) newYCoordinates = 0;
+    if (newYCoordinates > canvasHeight - this._pieceWidth)
+      newYCoordinates = canvasHeight - this._pieceWidth;
+
+    this.xCoordinates = newXCoordinates;
+    this.yCoordinates = newYCoordinates;
+  }
 
   clearCanvas(): void {
     this._canvas!.clearRect(

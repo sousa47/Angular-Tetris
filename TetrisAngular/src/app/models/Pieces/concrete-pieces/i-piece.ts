@@ -1,131 +1,122 @@
 import { TetrisPiece } from '../tetris-piece';
 
+/**
+ * Represents the I-shaped Tetris piece.
+ * Extends the base TetrisPiece class.
+ */
 export class IPiece extends TetrisPiece {
-  private _numberOfSections: number = 0;
-  private _pieceColor = 'lightblue';
+  private _numberOfSections = 4;
   private _currentRotationDegree: 0 | 90 | 180 | 270 = 90;
 
+  /**
+   * Creates a new I-shaped Tetris piece.
+   * @param xCoordinates - The initial x-coordinate of the piece.
+   * @param yCoordinates - The initial y-coordinate of the piece.
+   * @param color - The color of the piece. Defaults to 'lightblue'.
+   * @param canvas - The canvas rendering context. Defaults to null.
+   */
   constructor(
     xCoordinates: number,
     yCoordinates: number,
-    color: string,
+    color: string = 'lightblue',
     canvas: CanvasRenderingContext2D | null = null
   ) {
     super(xCoordinates, yCoordinates, color, canvas);
-    this._pieceColor = color;
   }
 
+  /**
+   * Draws the I-shaped Tetris piece on the canvas.
+   * @param heightLength - The height of the piece.
+   * @param widthLength - The width of the piece.
+   * @returns The canvas rendering context after drawing the piece.
+   */
   override drawPiece(
     heightLength: number,
-    widthLength: number,
-    numberOfSections: number = 4
+    widthLength: number
   ): CanvasRenderingContext2D {
-    this._numberOfSections = numberOfSections;
     this._pieceHeight = heightLength;
     this._pieceWidth = widthLength;
-    this._canvas!.fillStyle = this._pieceColor;
+    this._canvas!.fillStyle = this._color;
 
     this._canvas!.fillRect(
-      this._xCoordinates,
-      this._yCoordinates,
+      this.xCoordinates,
+      this.yCoordinates,
       widthLength,
       heightLength
     );
-
     this.drawBorderAndInnerBorder();
 
     return this._canvas!;
   }
 
+  /**
+   * Draws the outer and inner borders of the I-shaped Tetris piece.
+   * This method is called internally by the `drawPiece` method.
+   */
   private drawBorderAndInnerBorder(): void {
+    const sectionLength =
+      this._currentRotationDegree % 180 === 0
+        ? this._pieceWidth
+        : this._pieceHeight;
+
     // Outer border.
     this._canvas!.strokeRect(
-      this._xCoordinates,
-      this._yCoordinates,
+      this.xCoordinates,
+      this.yCoordinates,
       this._pieceWidth,
       this._pieceHeight
     );
 
-    // Inner border.
-    if (
-      this._currentRotationDegree === 90 ||
-      this._currentRotationDegree === 270
-    ) {
-      for (let i = 1; i < this._numberOfSections; i++) {
-        var sectionLineYCoordinates =
-          this._yCoordinates + (this._pieceHeight / this._numberOfSections) * i;
+    // Inner border. (The drawing is all done inside the for loop.)
+    for (let i = 1; i < this._numberOfSections; i++) {
+      const sectionLineCoordinates =
+        this._currentRotationDegree % 180 === 0
+          ? this.xCoordinates + (sectionLength / this._numberOfSections) * i
+          : this.yCoordinates + (sectionLength / this._numberOfSections) * i;
 
-        this._canvas!.beginPath();
-        this._canvas!.moveTo(this._xCoordinates, sectionLineYCoordinates);
-        this._canvas!.lineTo(
-          this._xCoordinates + this._pieceWidth,
-          sectionLineYCoordinates
-        );
-
-        this._canvas!.stroke();
-      }
-    } else {
-      for (let i = 1; i < this._numberOfSections; i++) {
-        var sectionLineXCoordinates =
-          this._xCoordinates + (this._pieceWidth / this._numberOfSections) * i;
-
-        this._canvas!.beginPath();
-        this._canvas!.moveTo(sectionLineXCoordinates, this._yCoordinates);
-        this._canvas!.lineTo(
-          sectionLineXCoordinates,
-          this._yCoordinates + this._pieceHeight
-        );
-
-        this._canvas!.stroke();
-      }
+      this._canvas!.beginPath();
+      this._canvas!.moveTo(
+        this._currentRotationDegree % 180 === 0
+          ? sectionLineCoordinates
+          : this.xCoordinates,
+        this._currentRotationDegree % 180 === 0
+          ? this.yCoordinates
+          : sectionLineCoordinates
+      );
+      this._canvas!.lineTo(
+        this._currentRotationDegree % 180 === 0
+          ? sectionLineCoordinates
+          : this.xCoordinates + this._pieceWidth,
+        this._currentRotationDegree % 180 === 0
+          ? this.yCoordinates + this._pieceHeight
+          : sectionLineCoordinates
+      );
+      this._canvas!.stroke();
     }
+    // end for
   }
 
+  /**
+   * Clears the previous position of the I-shaped Tetris piece on the canvas.
+   */
   override clearPiecePreviousPosition(): void {
     this._canvas!.clearRect(
-      this._xCoordinates - 1,
-      this._yCoordinates - 1,
+      this.xCoordinates - 1,
+      this.yCoordinates - 1,
       this._pieceWidth + 2,
       this._pieceHeight + 2
     );
   }
 
-  override movePiece(
-    xCoordinates: number,
-    yCoordinates: number
-  ): CanvasRenderingContext2D {
-    if (!this.moveIsPossible(xCoordinates, yCoordinates)) return this._canvas!;
-
-    this.clearPiecePreviousPosition();
-    this._xCoordinates = xCoordinates;
-    this._yCoordinates = yCoordinates;
-    this.drawPiece(this._pieceHeight, this._pieceWidth, this._numberOfSections);
-
-    return this._canvas!;
-  }
-
-  override moveIsPossible(xCoordinates: number, yCoordinates: number): boolean {
-    var check = true;
-
-    if (
-      xCoordinates < 0 ||
-      xCoordinates > this._canvas!.canvas.width - this._pieceWidth
-    )
-      check = false;
-    if (
-      yCoordinates < 0 ||
-      yCoordinates > this._canvas!.canvas.height - this._pieceHeight
-    )
-      check = false;
-
-    return check;
-  }
-
+  /**
+   * Rotates the I-shaped Tetris piece.
+   * @returns The canvas rendering context after rotating the piece.
+   */
   override rotatePiece(): CanvasRenderingContext2D {
     this.clearPiecePreviousPosition();
 
-    var newXCoordinates = this._xCoordinates;
-    var newYCoordinates = this._yCoordinates;
+    let newXCoordinates = this.xCoordinates;
+    let newYCoordinates = this.yCoordinates;
 
     if (this._currentRotationDegree === 0) {
       newXCoordinates += this._pieceWidth / 4;
@@ -146,22 +137,6 @@ export class IPiece extends TetrisPiece {
     }
 
     this.setRotationNewCoordinates(newXCoordinates, newYCoordinates);
-    return this.drawPiece(this._pieceWidth, this._pieceHeight, 4);
-  }
-
-  private setRotationNewCoordinates(
-    newXCoordinates: number,
-    newYCoordinates: number
-  ): void {
-    if (newXCoordinates < 0) newXCoordinates = 0;
-    if (newXCoordinates > this._canvas!.canvas.width - this._pieceHeight)
-      newXCoordinates = this._canvas!.canvas.width - this._pieceHeight;
-
-    if (newYCoordinates < 0) newYCoordinates = 0;
-    if (newYCoordinates > this._canvas!.canvas.height - this._pieceWidth)
-      newYCoordinates = this._canvas!.canvas.height - this._pieceWidth;
-
-    this._xCoordinates = newXCoordinates;
-    this._yCoordinates = newYCoordinates;
+    return this.drawPiece(this._pieceWidth, this._pieceHeight);
   }
 }

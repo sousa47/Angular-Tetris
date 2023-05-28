@@ -1,4 +1,4 @@
-import { TetrisPiece } from "../models/TetrisPiece/tetris-piece";
+import { TetrisPiece } from "../models/Pieces/tetris-piece";
 
 export interface TetrisGame {
     canvas: HTMLCanvasElement;
