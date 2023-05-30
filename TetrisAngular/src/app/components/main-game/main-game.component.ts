@@ -6,16 +6,18 @@ import { TetrisPieceService } from 'src/app/services/tetris-piece/tetris-piece.s
 @Component({
   selector: 'app-main-game',
   templateUrl: './main-game.component.html',
-  styleUrls: ['./main-game.component.css']
+  styleUrls: ['./main-game.component.css'],
 })
 export class MainGameComponent {
-
-  @ViewChild('canvas', { static: true })  canvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('canvas', { static: true }) canvas!: ElementRef<HTMLCanvasElement>;
 
   private _canvas: CanvasRenderingContext2D | null = null;
   private _currentPiece: TetrisPiece | null = null;
 
-  constructor(private _tetrisCanvasService: TetrisCanvasService, private _tetrisPieceService: TetrisPieceService) { }
+  constructor(
+    private _tetrisCanvasService: TetrisCanvasService,
+    private _tetrisPieceService: TetrisPieceService
+  ) {}
 
   ngOnInit(): void {
     this._canvas = this.canvas.nativeElement.getContext('2d');
@@ -40,12 +42,13 @@ export class MainGameComponent {
   }
 
   rotatePiece(): void {
-    this._canvas = this._currentPiece!.rotatePiece() || null;
+    this._canvas = this._currentPiece!.rotatePieceClockwise() || null;
   }
 
   getRandomPiece(): void {
-   var randomPieceAndPieceDrawing = this._tetrisPieceService.randomPieceAndPieceDrawing;
-   this._currentPiece = randomPieceAndPieceDrawing[0];
-   this._canvas = randomPieceAndPieceDrawing[1];
+    var randomPieceAndPieceDrawing =
+      this._tetrisPieceService.randomPieceAndPieceDrawing;
+    this._currentPiece = randomPieceAndPieceDrawing[0];
+    this._canvas = randomPieceAndPieceDrawing[1];
   }
 }

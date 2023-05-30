@@ -29,8 +29,7 @@ export class TetrisPieceService {
   }
 
   get randomPiece(): TetrisPiece {
-    // return this._tetrisPieces[(this._tetrisPieces.length * Math.random()) | 0];
-    return this._tetrisPieces[0];
+    return this._tetrisPieces[(this._tetrisPieces.length * Math.random()) | 0];
   }
 
   get randomPieceAndPieceDrawing(): [TetrisPiece, CanvasRenderingContext2D] {
@@ -91,7 +90,10 @@ export class TetrisPieceService {
 
   get tPieceDrawing(): CanvasRenderingContext2D {
     this.createTPiece();
-    return this._tetrisPieces[2].drawPiece(this._gridUnit, this._gridUnit * 3);
+    return this._tetrisPieces[2].drawPiece(
+      this._gridUnit * 2,
+      this._gridUnit * 3
+    );
   }
 
   get tPiece(): TetrisPiece {
@@ -127,7 +129,10 @@ export class TetrisPieceService {
 
   get sPieceDrawing(): CanvasRenderingContext2D {
     this.createSPiece();
-    return this._tetrisPieces[5].drawPiece(this._gridUnit, this._gridUnit * 2);
+    return this._tetrisPieces[5].drawPiece(
+      this._gridUnit * 2,
+      this._gridUnit * 3
+    );
   }
 
   get sPiece(): TetrisPiece {
@@ -137,7 +142,10 @@ export class TetrisPieceService {
 
   get zPieceDrawing(): CanvasRenderingContext2D {
     this.createZPiece();
-    return this._tetrisPieces[6].drawPiece(this._gridUnit, this._gridUnit * 2);
+    return this._tetrisPieces[6].drawPiece(
+      this._gridUnit * 2,
+      this._gridUnit * 3
+    );
   }
 
   get zPiece(): TetrisPiece {
@@ -208,12 +216,7 @@ export class TetrisPieceService {
   private createSPiece(): void {
     if (this.checkIfCanvasNotExists())
       throw new Error('Canvas does not exist, set it first');
-    var sPiece = new SPiece(
-      this._xSpawn - this._gridUnit,
-      0,
-      'green',
-      this._canvas
-    );
+    var sPiece = new SPiece(this._xSpawn, 0, 'green', this._canvas);
     sPiece.movement = this._gridUnit;
     this._tetrisPieces[5] = sPiece;
   }
