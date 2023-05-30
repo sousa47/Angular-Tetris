@@ -5,6 +5,10 @@ import { TetrisPiece, RotationDegree } from '../tetris-piece';
  * Extends the base TetrisPiece class.
  */
 export class IPiece extends TetrisPiece {
+  /**
+   * The number of inner sections of the I-shaped Tetris piece.
+   * Inner sections are the sections that are not the border of the piece.
+   */
   private _numberOfSections = 4;
 
   /**
@@ -14,7 +18,7 @@ export class IPiece extends TetrisPiece {
    * @param {string} [color='lightblue'] - The color of the piece. Defaults to 'lightblue'.
    * @param {CanvasRenderingContext2D | null} [canvas=null] - The canvas rendering context. Defaults to null.
    */
-  constructor(
+  public constructor(
     xCoordinates: number,
     yCoordinates: number,
     color: string = 'lightblue',
@@ -30,40 +34,32 @@ export class IPiece extends TetrisPiece {
    * @param widthLength - The width of the piece.
    * @returns The canvas rendering context after drawing the piece.
    */
-  override drawPiece(
+  public override drawPiece(
     heightLength: number,
     widthLength: number
   ): CanvasRenderingContext2D {
     this._pieceHeight = heightLength;
     this._pieceWidth = widthLength;
-    this._canvas!.fillStyle = this._color;
+    this._canvas!.fillStyle = this._pieceColor;
 
-    this._canvas!.fillRect(
+    this.drawPieceAndOuterBorder(
       this.xCoordinates,
       this.yCoordinates,
       widthLength,
       heightLength
     );
-    this.drawBorderAndInnerBorder();
+    this.drawInnerBorder();
 
     return this._canvas!;
   }
 
   /**
-   * Draws the outer and inner borders of the I-shaped Tetris piece.
+   * Draws the inner borders of the I-shaped Tetris piece.
    * This method is called internally by the `drawPiece` method.
    */
-  private drawBorderAndInnerBorder(): void {
+  private drawInnerBorder(): void {
     const sectionLength =
       this._rotationDegree % 180 === 0 ? this._pieceWidth : this._pieceHeight;
-
-    // Outer border.
-    this._canvas!.strokeRect(
-      this.xCoordinates,
-      this.yCoordinates,
-      this._pieceWidth,
-      this._pieceHeight
-    );
 
     // Inner border. (The drawing is all done inside the for loop.)
     for (let i = 1; i < this._numberOfSections; i++) {
@@ -97,12 +93,12 @@ export class IPiece extends TetrisPiece {
   /**
    * Clears the previous position of the I-shaped Tetris piece on the canvas.
    */
-  override clearPiecePreviousPosition(): void {
-    this._canvas!.clearRect(
-      this.xCoordinates - 1,
-      this.yCoordinates - 1,
-      this._pieceWidth + 2,
-      this._pieceHeight + 2
+  public override clearPiecePreviousPosition(): void {
+    this.clearPieceAndBorder(
+      this.xCoordinates,
+      this.yCoordinates,
+      this._pieceWidth,
+      this._pieceHeight
     );
   }
 
@@ -110,32 +106,37 @@ export class IPiece extends TetrisPiece {
    * Rotates the I-shaped Tetris piece.
    * @returns The canvas rendering context after rotating the piece.
    */
-  override rotatePiece(): CanvasRenderingContext2D {
+  public override rotatePiece(): CanvasRenderingContext2D {
     this.clearPiecePreviousPosition();
+
+    const halfWidth = this._pieceWidth / 2;
+    const halfHeight = this._pieceHeight / 2;
+    const quarterWidth = this._pieceWidth / 4;
+    const quarterHeight = this._pieceHeight / 4;
 
     let newXCoordinates = this.xCoordinates;
     let newYCoordinates = this.yCoordinates;
 
     switch (this._rotationDegree) {
-      case RotationDegree.Degree0:
-        newXCoordinates += this._pieceWidth / 4;
-        newYCoordinates -= this._pieceWidth / 2;
-        this._rotationDegree = RotationDegree.Degree90;
+      case 0:
+        newXCoordinates += quarterWidth;
+        newYCoordinates -= halfWidth;
+        this._rotationDegree = 90;
         break;
-      case RotationDegree.Degree90:
-        newXCoordinates -= this._pieceHeight / 4;
-        newYCoordinates += this._pieceHeight / 4;
-        this._rotationDegree = RotationDegree.Degree180;
+      case 90:
+        newXCoordinates -= quarterHeight;
+        newYCoordinates += quarterHeight;
+        this._rotationDegree = 180;
         break;
-      case RotationDegree.Degree180:
-        newXCoordinates += this._pieceWidth / 2;
-        newYCoordinates -= this._pieceWidth / 4;
-        this._rotationDegree = RotationDegree.Degree270;
+      case 180:
+        newXCoordinates += halfWidth;
+        newYCoordinates -= quarterWidth;
+        this._rotationDegree = 270;
         break;
-      case RotationDegree.Degree270:
-        newXCoordinates -= this._pieceHeight / 2;
-        newYCoordinates += this._pieceHeight / 2;
-        this._rotationDegree = RotationDegree.Degree0;
+      case 270:
+        newXCoordinates -= halfHeight;
+        newYCoordinates += halfHeight;
+        this._rotationDegree = 0;
         break;
     }
 

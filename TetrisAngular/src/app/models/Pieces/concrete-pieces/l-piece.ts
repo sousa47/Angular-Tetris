@@ -6,20 +6,40 @@ import { TetrisPiece, RotationDegree } from '../tetris-piece';
  */
 export class LPiece extends TetrisPiece {
   /**
+   * Object containing the logic functions for drawing the piece based on rotation degree.
+   */
+  private rotationDrawPieceLogic: Record<RotationDegree, () => void> = {
+    [0]: this.drawLPieceAt0DegreeRotation.bind(this),
+    [90]: this.drawLPieceAt90DegreeRotation.bind(this),
+    [180]: this.drawLPieceAt180DegreeRotation.bind(this),
+    [270]: this.drawLPieceAt270DegreeRotation.bind(this),
+  };
+
+  /**
+   * Object containing the logic functions for clear the piece based on rotation degree.
+   */
+  private rotationClearPieceLogic: Record<RotationDegree, () => void> = {
+    [0]: this.clearLPieceAt0DegreeRotation.bind(this),
+    [90]: this.clearLPieceAt90DegreeRotation.bind(this),
+    [180]: this.clearLPieceAt180DegreeRotation.bind(this),
+    [270]: this.clearLPieceAt270DegreeRotation.bind(this),
+  };
+
+  /**
    * Creates a new L-shaped Tetris piece.
    * @param {number} xCoordinates - The initial x-coordinate of the piece.
    * @param {number} yCoordinates - The initial y-coordinate of the piece.
    * @param {string} [color='orange'] - The color of the piece. Defaults to 'orange'.
    * @param {CanvasRenderingContext2D | null} [canvas=null] - The canvas rendering context. Defaults to null.
    */
-  constructor(
+  public constructor(
     xCoordinates: number,
     yCoordinates: number,
     color: string = 'orange',
     canvas: CanvasRenderingContext2D | null = null
   ) {
     super(xCoordinates, yCoordinates, color, canvas);
-    this._rotationDegree = RotationDegree.Degree0;
+    this._rotationDegree = 0;
   }
 
   /**
@@ -28,28 +48,17 @@ export class LPiece extends TetrisPiece {
    * @param {number} widthLength - The width length of the piece.
    * @returns {CanvasRenderingContext2D} The rendering context of the canvas.
    */
-  override drawPiece(
+  public override drawPiece(
     heightLength: number,
     widthLength: number
   ): CanvasRenderingContext2D {
     this._pieceHeight = heightLength;
     this._pieceWidth = widthLength;
-    this._canvas!.fillStyle = this._color;
+    this._canvas!.fillStyle = this._pieceColor;
 
-    switch (this._rotationDegree) {
-      case RotationDegree.Degree0:
-        this.drawLPieceAt0DegreeRotation();
-        break;
-      case RotationDegree.Degree90:
-        this.drawLPieceAt90DegreeRotation();
-        break;
-      case RotationDegree.Degree180:
-        this.drawLPieceAt180DegreeRotation();
-        break;
-      case RotationDegree.Degree270:
-        this.drawLPieceAt270DegreeRotation();
-        break;
-    }
+    const rotationLogicFunction =
+      this.rotationDrawPieceLogic[this._rotationDegree];
+    if (rotationLogicFunction) rotationLogicFunction();
 
     return this._canvas!;
   }
@@ -57,21 +66,10 @@ export class LPiece extends TetrisPiece {
   /**
    * Clears the previous position of the LPiece on the canvas.
    */
-  override clearPiecePreviousPosition(): void {
-    switch (this._rotationDegree) {
-      case RotationDegree.Degree0:
-        this.clearLPieceAt0DegreeRotation();
-        break;
-      case RotationDegree.Degree90:
-        this.clearLPieceAt90DegreeRotation();
-        break;
-      case RotationDegree.Degree180:
-        this.clearLPieceAt180DegreeRotation();
-        break;
-      case RotationDegree.Degree270:
-        this.clearLPieceAt270DegreeRotation();
-        break;
-    }
+  public override clearPiecePreviousPosition(): void {
+    const rotationLogicFunction =
+      this.rotationClearPieceLogic[this._rotationDegree];
+    if (rotationLogicFunction) rotationLogicFunction();
   }
 
   /**
@@ -81,26 +79,31 @@ export class LPiece extends TetrisPiece {
   override rotatePiece(): CanvasRenderingContext2D {
     this.clearPiecePreviousPosition();
 
+    const halfHeight = this._pieceHeight / 2;
+    const thirdHeight = this._pieceHeight / 3;
+    
+    const halfWidth = this._pieceWidth / 2;
+
     let newXCoordinates = this.xCoordinates;
     let newYCoordinates = this.yCoordinates;
 
     switch (this._rotationDegree) {
-      case RotationDegree.Degree0:
-        newXCoordinates -= this._pieceHeight / 2;
-        this._rotationDegree = RotationDegree.Degree90;
+      case 0:
+        newXCoordinates -= halfHeight;
+        this._rotationDegree = 90;
         break;
-      case RotationDegree.Degree90:
+      case 90:
         newXCoordinates -= this._pieceHeight / 3;
-        newYCoordinates += this._pieceWidth / 2;
-        this._rotationDegree = RotationDegree.Degree180;
+        newYCoordinates += halfWidth;
+        this._rotationDegree = 180;
         break;
-      case RotationDegree.Degree180:
-        newYCoordinates -= this._pieceHeight / 2;
-        this._rotationDegree = RotationDegree.Degree270;
+      case 180:
+        newYCoordinates -= halfHeight;
+        this._rotationDegree = 270;
         break;
-      case RotationDegree.Degree270:
+      case 270:
         newXCoordinates += this._pieceHeight * (2 / 3);
-        this._rotationDegree = RotationDegree.Degree0;
+        this._rotationDegree = 0;
         break;
     }
 
