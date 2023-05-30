@@ -6,85 +6,109 @@ import { TetrisPieceObjectService } from '../tetris-piece-object/tetris-piece-ob
   providedIn: 'root',
 })
 export class TetrisPieceDrawingService {
-
-
-
   constructor(public tetrisPieceObjectService: TetrisPieceObjectService) {}
 
-  get randomPieceAndPieceDrawing(): [TetrisPiece, CanvasRenderingContext2D] {
+  public randomPieceAndPieceDrawing(
+    context: CanvasRenderingContext2D
+  ): [TetrisPiece, CanvasRenderingContext2D] {
     const randomPiece = this.tetrisPieceObjectService.randomPiece;
     randomPiece.clearCanvas();
-    return [randomPiece, this.getPieceDrawing(randomPiece)];
+    return [randomPiece, this.getPieceDrawing(context, randomPiece)];
   }
 
-  getPieceDrawing(tetrisPiece: TetrisPiece): CanvasRenderingContext2D {
+  public getPieceDrawing(
+    context: CanvasRenderingContext2D,
+    tetrisPiece: TetrisPiece
+  ): CanvasRenderingContext2D {
     switch (tetrisPiece.constructor.name) {
       case 'IPiece':
-        return this.iPieceDrawing;
+        return this.iPieceDrawing(context);
       case 'JPiece':
-        return this.jPieceDrawing;
+        return this.jPieceDrawing(context);
       case 'LPiece':
-        return this.lPieceDrawing;
+        return this.lPieceDrawing(context);
       case 'OPiece':
-        return this.oPieceDrawing;
+        return this.oPieceDrawing(context);
       case 'SPiece':
-        return this.sPieceDrawing;
+        return this.sPieceDrawing(context);
       case 'TPiece':
-        return this.tPieceDrawing;
+        return this.tPieceDrawing(context);
       case 'ZPiece':
-        return this.zPieceDrawing;
+        return this.zPieceDrawing(context);
       default:
         throw new Error("Piece is not a valid piece, couldn't get drawing");
     }
   }
 
-  get iPieceDrawing(): CanvasRenderingContext2D {
+  public iPieceDrawing(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const numberOfSections = 4;
+
     return this.tetrisPieceObjectService.IPiece.drawPiece(
-      this.tetrisPieceObjectService.getCanvas().gridUnit * numberOfSections,
-      this.tetrisPieceObjectService.getCanvas().gridUnit
+      context,
+      this.tetrisPieceObjectService.getCanvas.gridUnit * numberOfSections,
+      this.tetrisPieceObjectService.getCanvas.gridUnit
     );
   }
 
-  get jPieceDrawing(): CanvasRenderingContext2D {
+  public jPieceDrawing(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     return this.tetrisPieceObjectService.JPiece.drawPiece(
-      this.tetrisPieceObjectService.getCanvas().gridUnit * 2,
-      this.tetrisPieceObjectService.getCanvas().gridUnit * 3
+      context,
+      this.tetrisPieceObjectService.getCanvas.gridUnit * 2,
+      this.tetrisPieceObjectService.getCanvas.gridUnit * 3
     );
   }
 
-  get lPieceDrawing(): CanvasRenderingContext2D {
+  public lPieceDrawing(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     return this.tetrisPieceObjectService.LPiece.drawPiece(
-      this.tetrisPieceObjectService.getCanvas().gridUnit * 2,
-      this.tetrisPieceObjectService.getCanvas().gridUnit * 3
+      context,
+      this.tetrisPieceObjectService.getCanvas.gridUnit * 2,
+      this.tetrisPieceObjectService.getCanvas.gridUnit * 3
     );
   }
 
-  get oPieceDrawing(): CanvasRenderingContext2D {
+  public oPieceDrawing(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     return this.tetrisPieceObjectService.OPiece.drawPiece(
-      this.tetrisPieceObjectService.getCanvas().gridUnit * 2,
-      this.tetrisPieceObjectService.getCanvas().gridUnit * 2
+      context,
+      this.tetrisPieceObjectService.getCanvas.gridUnit * 2,
+      this.tetrisPieceObjectService.getCanvas.gridUnit * 2
     );
   }
 
-  get sPieceDrawing(): CanvasRenderingContext2D {
+  public sPieceDrawing(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     return this.tetrisPieceObjectService.SPiece.drawPiece(
-      this.tetrisPieceObjectService.getCanvas().gridUnit * 2,
-      this.tetrisPieceObjectService.getCanvas().gridUnit * 3
+      context,
+      this.tetrisPieceObjectService.getCanvas.gridUnit * 2,
+      this.tetrisPieceObjectService.getCanvas.gridUnit * 3
     );
   }
 
-  get tPieceDrawing(): CanvasRenderingContext2D {
+  public tPieceDrawing(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     return this.tetrisPieceObjectService.TPiece.drawPiece(
-      this.tetrisPieceObjectService.getCanvas().gridUnit * 2,
-      this.tetrisPieceObjectService.getCanvas().gridUnit * 3
+      context,
+      this.tetrisPieceObjectService.getCanvas.gridUnit * 2,
+      this.tetrisPieceObjectService.getCanvas.gridUnit * 3
     );
   }
 
-  get zPieceDrawing(): CanvasRenderingContext2D {
+  public zPieceDrawing(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     return this.tetrisPieceObjectService.ZPiece.drawPiece(
-      this.tetrisPieceObjectService.getCanvas().gridUnit * 2,
-      this.tetrisPieceObjectService.getCanvas().gridUnit * 3
+      context,
+      this.tetrisPieceObjectService.getCanvas.gridUnit * 2,
+      this.tetrisPieceObjectService.getCanvas.gridUnit * 3
     );
   }
 }

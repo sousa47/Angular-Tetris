@@ -1,33 +1,27 @@
+import { Canvas } from '../../canvas';
 import { TetrisPiece, RotationDegree } from '../tetris-piece';
 
-/**
- * Class representing an TPiece tetris piece.
- * Extends the TetrisPiece class.
- */
 export class TPiece extends TetrisPiece {
-  /**
-   * Object containing the logic functions for drawing the piece based on rotation degree.
-   */
-  private rotationDrawPieceLogic: Record<RotationDegree, () => void> = {
+  private rotationDrawPieceLogic: Record<
+    RotationDegree,
+    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
+  > = {
     [0]: this.drawHorizontalTPiece.bind(this),
     [180]: this.drawHorizontalTPiece.bind(this),
     [90]: this.drawVerticalTPiece.bind(this),
     [270]: this.drawVerticalTPiece.bind(this),
   };
 
-  /**
-   * Object containing the logic functions for clearing the piece based on rotation degree.
-   */
-  private rotationClearPieceLogic: Record<RotationDegree, () => void> = {
+  private rotationClearPieceLogic: Record<
+    RotationDegree,
+    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
+  > = {
     [0]: this.clearHorizontalTPiece.bind(this),
     [180]: this.clearHorizontalTPiece.bind(this),
     [90]: this.clearVerticalTPiece.bind(this),
     [270]: this.clearVerticalTPiece.bind(this),
   };
 
-  /**
-   * Object containing the logic functions for checking if the piece can be moved based on rotation degree.
-   */
   private movePieceLogic: Record<
     RotationDegree,
     (xCoordinates: number, yCoordinates: number) => boolean
@@ -38,67 +32,45 @@ export class TPiece extends TetrisPiece {
     [270]: this.moveIsPossibleTPieceLeft.bind(this),
   };
 
-  /**
-   * Creates a new T-shaped Tetris piece.
-   * @param {number} xCoordinates - The initial x-coordinate of the piece.
-   * @param {number} yCoordinates - The initial y-coordinate of the piece.
-   * @param {string} [color='purple'] - The color of the piece. Defaults to 'purple'.
-   * @param {CanvasRenderingContext2D | null} [canvas=null] - The canvas rendering context. Defaults to null.
-   */
   public constructor(
     xCoordinates: number,
     yCoordinates: number,
     color: string = 'purple',
-    canvas: CanvasRenderingContext2D | null = null
+    canvas: Canvas
   ) {
     super(xCoordinates, yCoordinates, color, canvas);
     this._rotationDegree = 0;
   }
 
-  /**
-   * Draws the TPiece on the canvas.
-   * @param {number} heightLength - The height length of the piece.
-   * @param {number} widthLength - The width length of the piece.
-   * @returns {CanvasRenderingContext2D} The rendering context of the canvas.
-   */
   public override drawPiece(
+    context: CanvasRenderingContext2D,
     heightLength: number,
     widthLength: number
   ): CanvasRenderingContext2D {
     this._pieceHeight = heightLength;
     this._pieceWidth = widthLength;
-    this._canvas!.fillStyle = this._pieceColor;
+    context.fillStyle = this._pieceColor;
 
     const rotationLogicFunction =
       this.rotationDrawPieceLogic[this._rotationDegree];
-    if (rotationLogicFunction) rotationLogicFunction();
+    if (rotationLogicFunction) context = rotationLogicFunction(context);
 
-    return this._canvas!;
+    return context;
   }
 
-  /**
-   * Clears the previous position of the TPiece on the canvas.
-   */
-  public override clearPiecePreviousPosition(): void {
+  public override clearPiecePreviousPosition(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const rotationLogicFunction =
       this.rotationClearPieceLogic[this._rotationDegree];
-    if (rotationLogicFunction) rotationLogicFunction();
+    if (rotationLogicFunction) context = rotationLogicFunction(context);
+    return context;
   }
 
-  /**
-   * Verifies if the middle piece is up or right.
-   * @returns {boolean} True if the middle piece is up or right, false otherwise.
-   */
-  private isMiddlePieceUpOrRight(): boolean {
-    return this._rotationDegree === 0 || this._rotationDegree === 90;
-  }
-
-  /**
-   * Rotates the TPiece and redraws it on the canvas.
-   * @returns {CanvasRenderingContext2D} The rendering context of the canvas.
-   */
-  public override rotatePiece(): CanvasRenderingContext2D {
-    this.clearPiecePreviousPosition();
+  public override rotatePiece(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
+    context = this.clearPiecePreviousPosition(context);
 
     const halfHeight = this._pieceHeight / 2;
     const halfWidth = this._pieceWidth / 2;
@@ -126,39 +98,46 @@ export class TPiece extends TetrisPiece {
     }
 
     this.setRotationNewCoordinates(newXCoordinates, newYCoordinates);
-    return this.drawPiece(this._pieceWidth, this._pieceHeight);
+    return this.drawPiece(context, this._pieceWidth, this._pieceHeight);
   }
 
-  /**
-   * Draw the TPiece on the canvas when its horizontal.
-   */
-  private drawHorizontalTPiece(): void {
+  private isMiddlePieceUpOrRight(): boolean {
+    return this._rotationDegree === 0 || this._rotationDegree === 90;
+  }
+
+  private drawHorizontalTPiece(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const halfHeight = this._pieceHeight / 2;
     const thirdWidth = this._pieceWidth / 3;
 
     if (this.isMiddlePieceUpOrRight()) {
-      this.drawPieceAndOuterBorder(
+      context = this.drawPieceAndOuterBorder(
+        context,
         this.xCoordinates - halfHeight,
         this.yCoordinates + halfHeight,
         this._pieceWidth,
         halfHeight
       );
 
-      this.drawPieceAndOuterBorder(
+      context = this.drawPieceAndOuterBorder(
+        context,
         this.xCoordinates,
         this.yCoordinates,
         thirdWidth,
         halfHeight
       );
     } else {
-      this.drawPieceAndOuterBorder(
+      context = this.drawPieceAndOuterBorder(
+        context,
         this.xCoordinates,
         this.yCoordinates,
         this._pieceWidth,
         halfHeight
       );
 
-      this.drawPieceAndOuterBorder(
+      context = this.drawPieceAndOuterBorder(
+        context,
         this.xCoordinates + halfHeight,
         this.yCoordinates + halfHeight,
         thirdWidth,
@@ -166,100 +145,110 @@ export class TPiece extends TetrisPiece {
       );
     }
 
-    this.drawMiddleSquare(true);
+    context = this.drawMiddleSquare(context, true);
+    return context;
   }
 
-  /**
-   * Clears the horizontal TPiece from the canvas. Including the extremity piece.
-   */
-  private clearHorizontalTPiece(): void {
+  private clearHorizontalTPiece(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const halfHeight = this._pieceHeight / 2;
     const thirdWidth = this._pieceWidth / 3;
 
     if (this.isMiddlePieceUpOrRight()) {
-      this.clearPieceAndBorder(
+      context = this.clearPieceAndBorder(
+        context,
         this.xCoordinates - halfHeight,
         this.yCoordinates + halfHeight,
         this._pieceWidth,
         halfHeight
       );
 
-      this.clearPieceAndBorder(
+      context = this.clearPieceAndBorder(
+        context,
         this.xCoordinates,
         this.yCoordinates,
         thirdWidth,
         halfHeight
       );
     } else {
-      this.clearPieceAndBorder(
+      context = this.clearPieceAndBorder(
+        context,
         this.xCoordinates,
         this.yCoordinates,
         this._pieceWidth,
         halfHeight
       );
 
-      this.clearPieceAndBorder(
+      context = this.clearPieceAndBorder(
+        context,
         this.xCoordinates + halfHeight,
         this.yCoordinates + halfHeight,
         thirdWidth,
         halfHeight
       );
     }
+
+    return context;
   }
 
-  /**
-   * Draw the TPiece on the canvas when its vertical.
-   */
-  private drawVerticalTPiece(): void {
+  private drawVerticalTPiece(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const halfWidth = this._pieceWidth / 2;
     const thirdHeight = this._pieceHeight / 3;
     const middlePieceDirection = this.isMiddlePieceUpOrRight() ? 1 : -1;
 
-    this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndOuterBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates,
       halfWidth,
       this._pieceHeight
     );
 
-    this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndOuterBorder(
+      context,
       this.xCoordinates + halfWidth * middlePieceDirection,
       this.yCoordinates + thirdHeight,
       halfWidth,
       thirdHeight
     );
 
-    this.drawMiddleSquare(false);
+    context = this.drawMiddleSquare(context, false);
+    return context;
   }
 
-  /**
-   * Clears the vertical TPiece from the canvas. Including the extremity piece.
-   */
-  private clearVerticalTPiece(): void {
+  private clearVerticalTPiece(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const halfWidth = this._pieceWidth / 2;
     const thirdHeight = this._pieceHeight / 3;
     const middlePieceDirection = this.isMiddlePieceUpOrRight() ? 1 : -1;
 
-    this.clearPieceAndBorder(
+    context = this.clearPieceAndBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates,
       halfWidth,
       this._pieceHeight
     );
 
-    this.clearPieceAndBorder(
+    context = this.clearPieceAndBorder(
+      context,
       this.xCoordinates + halfWidth * middlePieceDirection,
       this.yCoordinates + thirdHeight,
       halfWidth,
       thirdHeight
     );
+
+    return context;
   }
 
-  /**
-   * Draws the middle square of the TPiece.
-   * @param horizontalTPiece True if the middle piece is horizontal, false otherwise.
-   */
-  private drawMiddleSquare(horizontalTPiece: boolean): void {
+  private drawMiddleSquare(
+    context: CanvasRenderingContext2D,
+    horizontalTPiece: boolean
+  ): CanvasRenderingContext2D {
     const thirdWidth = this._pieceWidth / 3;
     const thirdHeight = this._pieceHeight / 3;
     const halfHeight = this._pieceHeight / 2;
@@ -267,14 +256,16 @@ export class TPiece extends TetrisPiece {
 
     if (horizontalTPiece) {
       if (this.isMiddlePieceUpOrRight()) {
-        this.drawPieceAndOuterBorder(
+        context = this.drawPieceAndOuterBorder(
+          context,
           this.xCoordinates,
           this.yCoordinates + halfHeight,
           thirdWidth,
           halfHeight
         );
       } else {
-        this.drawPieceAndOuterBorder(
+        context = this.drawPieceAndOuterBorder(
+          context,
           this.xCoordinates + thirdWidth,
           this.yCoordinates,
           thirdWidth,
@@ -282,21 +273,18 @@ export class TPiece extends TetrisPiece {
         );
       }
     } else {
-      this.drawPieceAndOuterBorder(
+      context = this.drawPieceAndOuterBorder(
+        context,
         this.xCoordinates,
         this.yCoordinates + halfWidth,
         halfWidth,
         thirdHeight
       );
     }
+
+    return context;
   }
 
-  /**
-   * Adjusts the new rotation coordinates to ensure they are within the canvas boundaries.
-   * @param newXCoordinates - The new x-coordinate after rotation.
-   * @param newYCoordinates - The new y-coordinate after rotation.
-   * @returns True if the move is possible, false otherwise.
-   */
   public override canMoveToCoordinates(
     xCoordinates: number,
     yCoordinates: number
@@ -307,12 +295,6 @@ export class TPiece extends TetrisPiece {
     return false;
   }
 
-  /**
-   * Checks if moving the piece is possible at 0 degree rotation.
-   * @param xCoordinates - The X coordinates to check.
-   * @param yCoordinates - The Y coordinates to check.
-   * @returns True if the move is possible, false otherwise.
-   */
   private moveIsPossibleTPieceUp(
     xCoordinates: number,
     yCoordinates: number
@@ -323,12 +305,6 @@ export class TPiece extends TetrisPiece {
     );
   }
 
-  /**
-   * Checks if moving the piece is possible at 90 degree rotation.
-   * @param xCoordinates - The X coordinates to check.
-   * @param yCoordinates - The Y coordinates to check.
-   * @returns True if the move is possible, false otherwise.
-   */
   private moveIsPossibleTPieceDown(
     xCoordinates: number,
     yCoordinates: number
@@ -336,12 +312,6 @@ export class TPiece extends TetrisPiece {
     return super.canMoveToCoordinates(xCoordinates, yCoordinates);
   }
 
-  /**
-   * Checks if moving the piece is possible at 180 degree rotation.
-   * @param xCoordinates - The X coordinates to check.
-   * @param yCoordinates - The Y coordinates to check.
-   * @returns True if the move is possible, false otherwise.
-   */
   private moveIsPossibleTPieceRight(
     xCoordinates: number,
     yCoordinates: number
@@ -349,12 +319,6 @@ export class TPiece extends TetrisPiece {
     return super.canMoveToCoordinates(xCoordinates, yCoordinates);
   }
 
-  /**
-   * Checks if moving the piece is possible at 270 degree rotation.
-   * @param xCoordinates - The X coordinates to check.
-   * @param yCoordinates - The Y coordinates to check.
-   * @returns True if the move is possible, false otherwise.
-   */
   private moveIsPossibleTPieceLeft(
     xCoordinates: number,
     yCoordinates: number
@@ -368,11 +332,6 @@ export class TPiece extends TetrisPiece {
     );
   }
 
-  /**
-   * Sets the new coordinates after rotation and adjusts them if necessary.
-   * @param newXCoordinates - The new X coordinates.
-   * @param newYCoordinates - The new Y coordinates.
-   */
   public override setRotationNewCoordinates(
     newXCoordinates: number,
     newYCoordinates: number
@@ -388,10 +347,6 @@ export class TPiece extends TetrisPiece {
     this.yCoordinates = newYCoordinates;
   }
 
-  /**
-   * Checks and adjusts the new X coordinates after rotation.
-   * @param newXCoordinates - The new X coordinates.
-   */
   private checkRotationNewXCoordinates(newXCoordinates: number): void {
     const halfWidth = this._pieceWidth / 2;
     const thirdWidth = this._pieceWidth / 3;

@@ -23,7 +23,7 @@ export abstract class TetrisPiece implements TetrisInput {
     protected _pieceColor: string = 'black',
     protected readonly _canvas: Canvas
   ) {
-    this._context = this._canvas.context;
+    this._context = this._canvas.context || null;
     this._canvas = _canvas;
     this._context!.fillStyle = this._pieceColor;
     this._context!.lineWidth = 2;

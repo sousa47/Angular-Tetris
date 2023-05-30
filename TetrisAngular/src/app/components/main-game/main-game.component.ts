@@ -43,29 +43,31 @@ export class MainGameComponent implements AfterViewInit {
   }
 
   public movePieceRight(): void {
-    this._canvas = this._currentPiece!.movePieceRight() || null;
+    this._canvas = this._currentPiece!.movePieceRight(this._canvas!) || null;
   }
 
   public movePieceLeft(): void {
-    this._canvas = this._currentPiece!.movePieceLeft() || null;
+    this._canvas = this._currentPiece!.movePieceLeft(this._canvas!) || null;
   }
 
   public movePieceDown(): void {
-    this._canvas = this._currentPiece!.movePieceDown() || null;
+    this._canvas = this._currentPiece!.movePieceDown(this._canvas!) || null;
   }
 
   public movePieceDownhardDrop(): void {
-    this._canvas = this._currentPiece!.movePieceDown(true) || null;
+    this._canvas =
+      this._currentPiece!.movePieceDown(this._canvas!, true) || null;
   }
 
   public rotatePiece(): void {
-    this._canvas = this._currentPiece!.rotatePieceClockwise() || null;
+    this._canvas =
+      this._currentPiece!.rotatePieceClockwise(this._canvas!) || null;
   }
 
   // TODO: Remove later
   getRandomPiece(): void {
     var randomPieceAndPieceDrawing =
-      this._tetrisPieceDrawingService.randomPieceAndPieceDrawing;
+      this._tetrisPieceDrawingService.randomPieceAndPieceDrawing(this._canvas!);
     this._currentPiece = randomPieceAndPieceDrawing[0];
     this._canvas = randomPieceAndPieceDrawing[1];
   }

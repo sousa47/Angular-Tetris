@@ -51,15 +51,15 @@ export class HoldPieceComponent implements OnChanges, AfterViewInit {
     const holdenPiece = this._currentHoldPiece;
     this._currentHoldPiece = pieceToHold;
 
-    this._canvas!.scale(2, 2);
     this._canvas!.translate(
-      -(this._canvasGridUnit * 2),
-      this._canvasHalfHeight - this._canvasGridUnit * 4
+      -(this._canvasGridUnit * 4),
+      this._canvasHalfHeight - this._canvasGridUnit * 3
     );
 
     this._canvas!.clearRect(0, 0, 2000, 2000);
 
     this._canvas = this._tetrisPieceDrawingService.getPieceDrawing(
+      this._canvas!,
       this._currentHoldPiece!
     );
 
