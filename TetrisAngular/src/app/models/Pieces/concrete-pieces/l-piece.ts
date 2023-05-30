@@ -1,87 +1,68 @@
+import { Canvas } from '../../canvas';
 import { TetrisPiece, RotationDegree } from '../tetris-piece';
 
-/**
- * Represents the L-shaped Tetris piece.
- * Extends the base TetrisPiece class.
- */
 export class LPiece extends TetrisPiece {
-  /**
-   * Object containing the logic functions for drawing the piece based on rotation degree.
-   */
-  private rotationDrawPieceLogic: Record<RotationDegree, () => void> = {
+  private rotationDrawPieceLogic: Record<
+    RotationDegree,
+    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
+  > = {
     [0]: this.drawLPieceAt0DegreeRotation.bind(this),
     [90]: this.drawLPieceAt90DegreeRotation.bind(this),
     [180]: this.drawLPieceAt180DegreeRotation.bind(this),
     [270]: this.drawLPieceAt270DegreeRotation.bind(this),
   };
 
-  /**
-   * Object containing the logic functions for clear the piece based on rotation degree.
-   */
-  private rotationClearPieceLogic: Record<RotationDegree, () => void> = {
+  private rotationClearPieceLogic: Record<
+    RotationDegree,
+    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
+  > = {
     [0]: this.clearLPieceAt0DegreeRotation.bind(this),
     [90]: this.clearLPieceAt90DegreeRotation.bind(this),
     [180]: this.clearLPieceAt180DegreeRotation.bind(this),
     [270]: this.clearLPieceAt270DegreeRotation.bind(this),
   };
 
-  /**
-   * Creates a new L-shaped Tetris piece.
-   * @param {number} xCoordinates - The initial x-coordinate of the piece.
-   * @param {number} yCoordinates - The initial y-coordinate of the piece.
-   * @param {string} [color='orange'] - The color of the piece. Defaults to 'orange'.
-   * @param {CanvasRenderingContext2D | null} [canvas=null] - The canvas rendering context. Defaults to null.
-   */
   public constructor(
     xCoordinates: number,
     yCoordinates: number,
     color: string = 'orange',
-    canvas: CanvasRenderingContext2D | null = null
+    canvas: Canvas
   ) {
     super(xCoordinates, yCoordinates, color, canvas);
     this._rotationDegree = 0;
   }
 
-  /**
-   * Draws the LPiece on the canvas.
-   * @param {number} heightLength - The height length of the piece.
-   * @param {number} widthLength - The width length of the piece.
-   * @returns {CanvasRenderingContext2D} The rendering context of the canvas.
-   */
   public override drawPiece(
+    context: CanvasRenderingContext2D,
     heightLength: number,
     widthLength: number
   ): CanvasRenderingContext2D {
     this._pieceHeight = heightLength;
     this._pieceWidth = widthLength;
-    this._canvas!.fillStyle = this._pieceColor;
+    context.fillStyle = this._pieceColor;
 
     const rotationLogicFunction =
       this.rotationDrawPieceLogic[this._rotationDegree];
-    if (rotationLogicFunction) rotationLogicFunction();
+    if (rotationLogicFunction) context = rotationLogicFunction(context);
 
-    return this._canvas!;
+    return context;
   }
 
-  /**
-   * Clears the previous position of the LPiece on the canvas.
-   */
-  public override clearPiecePreviousPosition(): void {
+  public override clearPiecePreviousPosition(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const rotationLogicFunction =
       this.rotationClearPieceLogic[this._rotationDegree];
-    if (rotationLogicFunction) rotationLogicFunction();
+    if (rotationLogicFunction) context = rotationLogicFunction(context);
+    return context;
   }
 
-  /**
-   * Rotates the LPiece and redraws it on the canvas.
-   * @returns {CanvasRenderingContext2D} The rendering context of the canvas.
-   */
-  override rotatePiece(): CanvasRenderingContext2D {
-    this.clearPiecePreviousPosition();
+  public override rotatePiece(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
+    context = this.clearPiecePreviousPosition(context);
 
     const halfHeight = this._pieceHeight / 2;
-    const thirdHeight = this._pieceHeight / 3;
-    
     const halfWidth = this._pieceWidth / 2;
 
     let newXCoordinates = this.xCoordinates;
@@ -108,286 +89,264 @@ export class LPiece extends TetrisPiece {
     }
 
     this.setRotationNewCoordinates(newXCoordinates, newYCoordinates);
-    return this.drawPiece(this._pieceWidth, this._pieceHeight);
+    return this.drawPiece(context, this._pieceWidth, this._pieceHeight);
   }
 
-  /**
-   * Draws the LPiece at 0-degree rotation.
-   */
-  private drawLPieceAt0DegreeRotation(): void {
-    this._canvas!.fillRect(
+  private drawLPieceAt0DegreeRotation(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
+    const halfHeight = this._pieceHeight / 2;
+    const thirdWidth = this._pieceWidth / 3;
+
+    context = this.drawPieceAndOuterBorder(
+      context,
       this.xCoordinates - this._pieceHeight,
-      this.yCoordinates + this._pieceHeight / 2,
+      this.yCoordinates + halfHeight,
       this._pieceWidth,
-      this._pieceHeight / 2
+      halfHeight
     );
 
-    this._canvas!.strokeRect(
-      this.xCoordinates - this._pieceHeight,
-      this.yCoordinates + this._pieceHeight / 2,
-      this._pieceWidth,
-      this._pieceHeight / 2
-    );
-
-    this._canvas!.fillRect(
+    context = this.drawPieceAndOuterBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates,
-      this._pieceWidth / 3,
-      this._pieceHeight / 2
+      thirdWidth,
+      halfHeight
     );
 
-    this._canvas!.strokeRect(
-      this.xCoordinates,
-      this.yCoordinates,
-      this._pieceWidth / 3,
-      this._pieceHeight / 2
+    context.beginPath();
+    context.moveTo(
+      this.xCoordinates - thirdWidth,
+      this.yCoordinates + halfHeight
     );
-
-    this._canvas!.beginPath();
-    this._canvas!.moveTo(
-      this.xCoordinates - this._pieceWidth / 3,
-      this.yCoordinates + this._pieceHeight / 2
-    );
-    this._canvas!.lineTo(
-      this.xCoordinates - this._pieceWidth / 3,
+    context.lineTo(
+      this.xCoordinates - thirdWidth,
       this.yCoordinates + this._pieceHeight
     );
-    this._canvas!.moveTo(
-      this.xCoordinates,
-      this.yCoordinates + this._pieceHeight / 2
-    );
-    this._canvas!.lineTo(
-      this.xCoordinates,
-      this.yCoordinates + this._pieceHeight
-    );
-    this._canvas!.stroke();
+    context.moveTo(this.xCoordinates, this.yCoordinates + halfHeight);
+    context.lineTo(this.xCoordinates, this.yCoordinates + this._pieceHeight);
+    context.stroke();
+
+    return context;
   }
 
-  /**
-   * Clears the LPiece at 0-degree rotation.
-   */
-  private clearLPieceAt0DegreeRotation(): void {
-    this._canvas!.clearRect(
-      this.xCoordinates - this._pieceHeight - 1,
-      this.yCoordinates + this._pieceHeight / 2 - 1,
-      this._pieceWidth + 2,
-      this._pieceHeight / 2 + 2
-    );
-    this._canvas!.clearRect(
-      this.xCoordinates - 1,
-      this.yCoordinates - 1,
-      this._pieceWidth / 3 + 2,
-      this._pieceHeight / 2 + 2
-    );
-  }
+  private clearLPieceAt0DegreeRotation(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
+    const halfHeight = this._pieceHeight / 2;
+    const thirdWidth = this._pieceWidth / 3;
 
-  /**
-   * Draws the LPiece at 90-degree rotation.
-   */
-  private drawLPieceAt90DegreeRotation(): void {
-    this._canvas!.fillRect(
+    context = this.clearPieceAndBorder(
+      context,
+      this.xCoordinates - this._pieceHeight,
+      this.yCoordinates + halfHeight,
+      this._pieceWidth,
+      halfHeight
+    );
+
+    context = this.clearPieceAndBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates,
-      this._pieceWidth / 2,
+      thirdWidth,
+      halfHeight
+    );
+
+    return context;
+  }
+
+  private drawLPieceAt90DegreeRotation(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
+    const halfWidth = this._pieceWidth / 2;
+    const thirdHeight = this._pieceHeight / 3;
+    const twoThirdsHeight = this._pieceHeight * (2 / 3);
+
+    context = this.drawPieceAndOuterBorder(
+      context,
+      this.xCoordinates,
+      this.yCoordinates,
+      halfWidth,
       this._pieceHeight
     );
 
-    this._canvas!.strokeRect(
-      this.xCoordinates,
-      this.yCoordinates,
-      this._pieceWidth / 2,
-      this._pieceHeight
-    );
-
-    this._canvas!.fillRect(
-      this.xCoordinates + this._pieceWidth / 2,
+    context = this.drawPieceAndOuterBorder(
+      context,
+      this.xCoordinates + halfWidth,
       this.yCoordinates + this._pieceWidth,
-      this._pieceWidth / 2,
-      this._pieceHeight / 3
+      halfWidth,
+      thirdHeight
     );
 
-    this._canvas!.strokeRect(
-      this.xCoordinates + this._pieceWidth / 2,
-      this.yCoordinates + this._pieceWidth,
-      this._pieceWidth / 2,
-      this._pieceHeight / 3
+    context.beginPath();
+    context.moveTo(this.xCoordinates, this.yCoordinates + thirdHeight);
+    context.lineTo(
+      this.xCoordinates + halfWidth,
+      this.yCoordinates + thirdHeight
     );
+    context.moveTo(this.xCoordinates, this.yCoordinates + twoThirdsHeight);
+    context.lineTo(
+      this.xCoordinates + halfWidth,
+      this.yCoordinates + twoThirdsHeight
+    );
+    context.stroke();
 
-    this._canvas!.beginPath();
-    this._canvas!.moveTo(
-      this.xCoordinates,
-      this.yCoordinates + this._pieceHeight / 3
-    );
-    this._canvas!.lineTo(
-      this.xCoordinates + this._pieceWidth / 2,
-      this.yCoordinates + this._pieceHeight / 3
-    );
-    this._canvas!.moveTo(
-      this.xCoordinates,
-      this.yCoordinates + this._pieceHeight * (2 / 3)
-    );
-    this._canvas!.lineTo(
-      this.xCoordinates + this._pieceWidth / 2,
-      this.yCoordinates + this._pieceHeight * (2 / 3)
-    );
-    this._canvas!.stroke();
+    return context;
   }
 
-  /**
-   * Clears the LPiece at 90-degree rotation.
-   */
-  private clearLPieceAt90DegreeRotation(): void {
-    this._canvas!.clearRect(
-      this.xCoordinates - 1,
-      this.yCoordinates - 1,
-      this._pieceWidth / 2 + 2,
-      this._pieceHeight + 2
-    );
-    this._canvas!.clearRect(
-      this.xCoordinates + this._pieceWidth / 2 - 1,
-      this.yCoordinates + this._pieceWidth - 1,
-      this._pieceWidth / 2 + 2,
-      this._pieceHeight / 3 + 2
-    );
-  }
-
-  /**
-   * Draws the LPiece at 180-degree rotation.
-   */
-  private drawLPieceAt180DegreeRotation(): void {
-    this._canvas!.fillRect(
+  private clearLPieceAt90DegreeRotation(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
+    context = this.clearPieceAndBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates,
       this._pieceWidth,
-      this._pieceHeight / 2
+      this._pieceHeight
+    );
+    context = this.clearPieceAndBorder(
+      context,
+      this.xCoordinates + this._pieceWidth,
+      this.yCoordinates + this._pieceWidth,
+      this._pieceWidth,
+      this._pieceHeight
     );
 
-    this._canvas!.strokeRect(
+    return context;
+  }
+
+  private drawLPieceAt180DegreeRotation(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
+    const halfHeight = this._pieceHeight / 2;
+    const thirdWidth = this._pieceWidth / 3;
+    const twoThirdsWidth = this._pieceWidth * (2 / 3);
+
+    context = this.drawPieceAndOuterBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates,
       this._pieceWidth,
-      this._pieceHeight / 2
+      halfHeight
     );
 
-    this._canvas!.fillRect(
+    context = this.drawPieceAndOuterBorder(
+      context,
       this.xCoordinates,
-      this.yCoordinates + this._pieceHeight / 2,
-      this._pieceWidth / 3,
-      this._pieceHeight / 2
+      this.yCoordinates + halfHeight,
+      thirdWidth,
+      halfHeight
     );
 
-    this._canvas!.strokeRect(
-      this.xCoordinates,
-      this.yCoordinates + this._pieceHeight / 2,
-      this._pieceWidth / 3,
-      this._pieceHeight / 2
+    context.beginPath();
+    context.moveTo(this.xCoordinates + thirdWidth, this.yCoordinates);
+    context.lineTo(
+      this.xCoordinates + thirdWidth,
+      this.yCoordinates + halfHeight
     );
+    context.moveTo(this.xCoordinates + twoThirdsWidth, this.yCoordinates);
+    context.lineTo(
+      this.xCoordinates + twoThirdsWidth,
+      this.yCoordinates + halfHeight
+    );
+    context.stroke();
 
-    this._canvas!.beginPath();
-    this._canvas!.moveTo(
-      this.xCoordinates + this._pieceWidth / 3,
-      this.yCoordinates
-    );
-    this._canvas!.lineTo(
-      this.xCoordinates + this._pieceWidth / 3,
-      this.yCoordinates + this._pieceHeight / 2
-    );
-    this._canvas!.moveTo(
-      this.xCoordinates + this._pieceWidth * (2 / 3),
-      this.yCoordinates
-    );
-    this._canvas!.lineTo(
-      this.xCoordinates + this._pieceWidth * (2 / 3),
-      this.yCoordinates + this._pieceHeight / 2
-    );
-    this._canvas!.stroke();
+    return context;
   }
 
-  /**
-   * Clears the LPiece at 180-degree rotation.
-   */
-  private clearLPieceAt180DegreeRotation(): void {
-    this._canvas!.clearRect(
-      this.xCoordinates - 1,
-      this.yCoordinates - 1,
-      this._pieceWidth + 2,
-      this._pieceHeight / 2 + 2
-    );
-    this._canvas!.clearRect(
-      this.xCoordinates - 1,
-      this.yCoordinates + this._pieceHeight / 2 - 1,
-      this._pieceWidth / 3 + 2,
-      this._pieceHeight / 2 + 2
-    );
-  }
+  private clearLPieceAt180DegreeRotation(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
+    const halfHeight = this._pieceHeight / 2;
+    const thirdWidth = this._pieceWidth / 3;
 
-  /**
-   * Draws the LPiece at 270-degree rotation.
-   */
-  private drawLPieceAt270DegreeRotation(): void {
-    this._canvas!.fillRect(
-      this.xCoordinates + this._pieceWidth / 2,
+    context = this.clearPieceAndBorder(
+      context,
+      this.xCoordinates,
       this.yCoordinates,
-      this._pieceWidth / 2,
+      this._pieceWidth,
+      halfHeight
+    );
+
+    context = this.clearPieceAndBorder(
+      context,
+      this.xCoordinates,
+      this.yCoordinates + halfHeight,
+      thirdWidth,
+      halfHeight
+    );
+
+    return context;
+  }
+
+  private drawLPieceAt270DegreeRotation(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
+    const halfWidth = this._pieceWidth / 2;
+    const thirdHeight = this._pieceHeight / 3;
+    const twoThirdsHeight = this._pieceHeight * (2 / 3);
+
+    context = this.drawPieceAndOuterBorder(
+      context,
+      this.xCoordinates + halfWidth,
+      this.yCoordinates,
+      halfWidth,
       this._pieceHeight
     );
 
-    this._canvas!.strokeRect(
-      this.xCoordinates + this._pieceWidth / 2,
+    context = this.drawPieceAndOuterBorder(
+      context,
+      this.xCoordinates,
       this.yCoordinates,
-      this._pieceWidth / 2,
+      halfWidth,
+      thirdHeight
+    );
+
+    context.beginPath();
+    context.moveTo(
+      this.xCoordinates + halfWidth,
+      this.yCoordinates + thirdHeight
+    );
+    context.lineTo(
+      this.xCoordinates + this._pieceWidth,
+      this.yCoordinates + thirdHeight
+    );
+    context.moveTo(
+      this.xCoordinates + halfWidth,
+      this.yCoordinates + twoThirdsHeight
+    );
+    context.lineTo(
+      this.xCoordinates + this._pieceWidth,
+      this.yCoordinates + twoThirdsHeight
+    );
+    context.stroke();
+
+    return context;
+  }
+
+  private clearLPieceAt270DegreeRotation(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
+    const halfWidth = this._pieceWidth / 2;
+    const thirdHeight = this._pieceHeight / 3;
+    const twoThirdsHeight = this._pieceHeight * (2 / 3);
+
+    context = this.clearPieceAndBorder(
+      context,
+      this.xCoordinates + halfWidth,
+      this.yCoordinates,
+      halfWidth,
       this._pieceHeight
     );
 
-    this._canvas!.fillRect(
+    context = this.clearPieceAndBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates,
-      this._pieceWidth / 2,
-      this._pieceHeight / 3
+      halfWidth,
+      thirdHeight
     );
 
-    this._canvas!.strokeRect(
-      this.xCoordinates,
-      this.yCoordinates,
-      this._pieceWidth / 2,
-      this._pieceHeight / 3
-    );
-
-    this._canvas!.beginPath();
-    this._canvas!.moveTo(
-      this.xCoordinates + this._pieceWidth / 2,
-      this.yCoordinates + this._pieceHeight / 3
-    );
-    this._canvas!.lineTo(
-      this.xCoordinates + this._pieceWidth,
-      this.yCoordinates + this._pieceHeight / 3
-    );
-    this._canvas!.moveTo(
-      this.xCoordinates + this._pieceWidth / 2,
-      this.yCoordinates + this._pieceHeight * (2 / 3)
-    );
-    this._canvas!.lineTo(
-      this.xCoordinates + this._pieceWidth,
-      this.yCoordinates + this._pieceHeight * (2 / 3)
-    );
-    this._canvas!.stroke();
-  }
-
-  /**
-   * Clears the LPiece at 270-degree rotation.
-   */
-  private clearLPieceAt270DegreeRotation(): void {
-    this._canvas!.clearRect(
-      this.xCoordinates + this._pieceWidth / 2 - 1,
-      this.yCoordinates - 1,
-      this._pieceWidth / 2 + 2,
-      this._pieceHeight + 2
-    );
-    this._canvas!.clearRect(
-      this.xCoordinates - 1,
-      this.yCoordinates - 1,
-      this._pieceWidth / 2 + 2,
-      this._pieceHeight / 3 + 2
-    );
+    return context;
   }
 }

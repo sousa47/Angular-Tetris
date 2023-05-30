@@ -1,0 +1,14 @@
+.canvas-section {
+  border: 3px solid black;
+  width: 200px;
+  height: 200px;
+}
+
+.canvas-section > canvas{
+  position: absolute;
+  z-index: -1;
+}
+
+canvas + canvas{
+  position: absolute;
+}

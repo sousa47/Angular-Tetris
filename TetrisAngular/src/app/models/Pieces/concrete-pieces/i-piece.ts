@@ -1,63 +1,44 @@
+import { Canvas } from '../../canvas';
 import { TetrisPiece, RotationDegree } from '../tetris-piece';
 
-/**
- * Represents the I-shaped Tetris piece.
- * Extends the base TetrisPiece class.
- */
 export class IPiece extends TetrisPiece {
-  /**
-   * The number of inner sections of the I-shaped Tetris piece.
-   * Inner sections are the sections that are not the border of the piece.
-   */
   private _numberOfSections = 4;
 
-  /**
-   * Creates a new I-shaped Tetris piece.
-   * @param {number} xCoordinates - The initial x-coordinate of the piece.
-   * @param {number} yCoordinates - The initial y-coordinate of the piece.
-   * @param {string} [color='lightblue'] - The color of the piece. Defaults to 'lightblue'.
-   * @param {CanvasRenderingContext2D | null} [canvas=null] - The canvas rendering context. Defaults to null.
-   */
   public constructor(
     xCoordinates: number,
     yCoordinates: number,
     color: string = 'lightblue',
-    canvas: CanvasRenderingContext2D | null = null
+    canvas: Canvas
   ) {
     super(xCoordinates, yCoordinates, color, canvas);
     this._rotationDegree = RotationDegree.Degree90;
   }
 
-  /**
-   * Draws the I-shaped Tetris piece on the canvas.
-   * @param heightLength - The height of the piece.
-   * @param widthLength - The width of the piece.
-   * @returns The canvas rendering context after drawing the piece.
-   */
   public override drawPiece(
+    context: CanvasRenderingContext2D,
     heightLength: number,
     widthLength: number
   ): CanvasRenderingContext2D {
     this._pieceHeight = heightLength;
     this._pieceWidth = widthLength;
-    this._canvas!.fillStyle = this._pieceColor;
+    context.fillStyle = this._pieceColor;
 
-    this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndOuterBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates,
       widthLength,
       heightLength
     );
-    this.drawInnerBorder();
 
-    return this._canvas!;
+    context = this.drawInnerBorder(context);
+
+    return context;
   }
 
-  /**
-   * Draws the inner borders of the I-shaped Tetris piece.
-   * This method is called internally by the `drawPiece` method.
-   */
-  private drawInnerBorder(): void {
+  private drawInnerBorder(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const sectionLength =
       this._rotationDegree % 180 === 0 ? this._pieceWidth : this._pieceHeight;
 
@@ -68,8 +49,8 @@ export class IPiece extends TetrisPiece {
           ? this.xCoordinates + (sectionLength / this._numberOfSections) * i
           : this.yCoordinates + (sectionLength / this._numberOfSections) * i;
 
-      this._canvas!.beginPath();
-      this._canvas!.moveTo(
+      context.beginPath();
+      context.moveTo(
         this._rotationDegree % 180 === 0
           ? sectionLineCoordinates
           : this.xCoordinates,
@@ -77,7 +58,7 @@ export class IPiece extends TetrisPiece {
           ? this.yCoordinates
           : sectionLineCoordinates
       );
-      this._canvas!.lineTo(
+      context.lineTo(
         this._rotationDegree % 180 === 0
           ? sectionLineCoordinates
           : this.xCoordinates + this._pieceWidth,
@@ -85,16 +66,17 @@ export class IPiece extends TetrisPiece {
           ? this.yCoordinates + this._pieceHeight
           : sectionLineCoordinates
       );
-      this._canvas!.stroke();
+      context.stroke();
     }
-    // end for
+
+    return context;
   }
 
-  /**
-   * Clears the previous position of the I-shaped Tetris piece on the canvas.
-   */
-  public override clearPiecePreviousPosition(): void {
-    this.clearPieceAndBorder(
+  public override clearPiecePreviousPosition(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
+    return this.clearPieceAndBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates,
       this._pieceWidth,
@@ -102,12 +84,10 @@ export class IPiece extends TetrisPiece {
     );
   }
 
-  /**
-   * Rotates the I-shaped Tetris piece.
-   * @returns The canvas rendering context after rotating the piece.
-   */
-  public override rotatePiece(): CanvasRenderingContext2D {
-    this.clearPiecePreviousPosition();
+  public override rotatePiece(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
+    context = this.clearPiecePreviousPosition(context);
 
     const halfWidth = this._pieceWidth / 2;
     const halfHeight = this._pieceHeight / 2;
@@ -141,6 +121,6 @@ export class IPiece extends TetrisPiece {
     }
 
     this.setRotationNewCoordinates(newXCoordinates, newYCoordinates);
-    return this.drawPiece(this._pieceWidth, this._pieceHeight);
+    return this.drawPiece(context, this._pieceWidth, this._pieceHeight);
   }
 }

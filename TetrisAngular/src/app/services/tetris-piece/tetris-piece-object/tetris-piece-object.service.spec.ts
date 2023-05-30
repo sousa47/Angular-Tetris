@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { TetrisPieceService } from './tetris-piece.service';
+import { TetrisPieceObjectService } from './tetris-piece-object.service';
 
 describe('TetrisPieceService', () => {
-  let service: TetrisPieceService;
+  let service: TetrisPieceObjectService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(TetrisPieceService);
+    service = TestBed.inject(TetrisPieceObjectService);
   });
 
   it('should be created', () => {

@@ -1,33 +1,27 @@
+import { Canvas } from '../../canvas';
 import { TetrisPiece, RotationDegree } from '../tetris-piece';
 
-/**
- * Class representing an SPiece tetris piece.
- * Extends the TetrisPiece class.
- */
 export class SPiece extends TetrisPiece {
-  /**
-   * Object containing the logic functions for drawing the piece based on rotation degree.
-   */
-  private rotationDrawPieceLogic: Record<RotationDegree, () => void> = {
+  private rotationDrawPieceLogic: Record<
+    RotationDegree,
+    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
+  > = {
     [0]: this.drawSPieceAt00Or180DegreeRotation.bind(this),
     [180]: this.drawSPieceAt00Or180DegreeRotation.bind(this),
     [90]: this.drawSPieceAt90Or270DegreeRotation.bind(this),
     [270]: this.drawSPieceAt90Or270DegreeRotation.bind(this),
   };
 
-  /**
-   * Object containing the logic functions for clearing the piece based on rotation degree.
-   */
-  private rotationClearPieceLogic: Record<RotationDegree, () => void> = {
+  private rotationClearPieceLogic: Record<
+    RotationDegree,
+    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
+  > = {
     [0]: this.clearSPieceAt0Or180DegreeRotation.bind(this),
     [180]: this.clearSPieceAt0Or180DegreeRotation.bind(this),
     [90]: this.clearSPieceAt90Or270DegreeRotation.bind(this),
     [270]: this.clearSPieceAt90Or270DegreeRotation.bind(this),
   };
 
-  /**
-   * Object containing the logic functions for checking if the piece can be moved based on rotation degree.
-   */
   private movePieceLogic: Record<
     RotationDegree,
     (xCoordinates: number, yCoordinates: number) => boolean
@@ -38,59 +32,45 @@ export class SPiece extends TetrisPiece {
     [270]: this.moveIsPossibleAt90Or270DegreeRotation.bind(this),
   };
 
-  /**
-   * Creates a new S-shaped Tetris piece.
-   * @param {number} xCoordinates - The initial x-coordinate of the piece.
-   * @param {number} yCoordinates - The initial y-coordinate of the piece.
-   * @param {string} [color='green'] - The color of the piece. Defaults to 'green'.
-   * @param {CanvasRenderingContext2D | null} [canvas=null] - The canvas rendering context. Defaults to null.
-   */
   constructor(
     xCoordinates: number,
     yCoordinates: number,
     color: string = 'green',
-    canvas: CanvasRenderingContext2D | null = null
+    canvas: Canvas
   ) {
     super(xCoordinates, yCoordinates, color, canvas);
     this._rotationDegree = 0;
   }
 
-  /**
-   * Draws the SPiece on the canvas.
-   * @param {number} heightLength - The height length of the piece.
-   * @param {number} widthLength - The width length of the piece.
-   * @returns {CanvasRenderingContext2D} The rendering context of the canvas.
-   */
   override drawPiece(
+    context: CanvasRenderingContext2D,
     heightLength: number,
     widthLength: number
   ): CanvasRenderingContext2D {
     this._pieceHeight = heightLength;
     this._pieceWidth = widthLength;
-    this._canvas!.fillStyle = this._pieceColor;
+    context.fillStyle = this._pieceColor;
 
     const rotationLogicFunction =
       this.rotationDrawPieceLogic[this._rotationDegree];
-    if (rotationLogicFunction) rotationLogicFunction();
+    if (rotationLogicFunction) context = rotationLogicFunction(context);
 
-    return this._canvas!;
+    return context;
   }
 
-  /**
-   * Clears the previous position of the SPiece on the canvas.
-   */
-  override clearPiecePreviousPosition(): void {
+  public override clearPiecePreviousPosition(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const rotationLogicFunction =
       this.rotationClearPieceLogic[this._rotationDegree];
-    if (rotationLogicFunction) rotationLogicFunction();
+    if (rotationLogicFunction) context = rotationLogicFunction(context);
+    return context;
   }
 
-  /**
-   * Rotates the SPiece and redraws it on the canvas.
-   * @returns {CanvasRenderingContext2D} The rendering context of the canvas.
-   */
-  override rotatePiece(): CanvasRenderingContext2D {
-    this.clearPiecePreviousPosition();
+  public override rotatePiece(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
+    context = this.clearPiecePreviousPosition(context);
 
     const halfHeight = this._pieceHeight / 2;
     const halfWidth = this._pieceWidth / 2;
@@ -118,18 +98,18 @@ export class SPiece extends TetrisPiece {
     }
 
     this.setRotationNewCoordinates(newXCoordinates, newYCoordinates);
-    return this.drawPiece(this._pieceWidth, this._pieceHeight);
+    return this.drawPiece(context, this._pieceWidth, this._pieceHeight);
   }
 
-  /**
-   * Draws the SPiece at 0-degree or 180-degree rotation.
-   */
-  private drawSPieceAt00Or180DegreeRotation(): void {
+  private drawSPieceAt00Or180DegreeRotation(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const halfHeight = this._pieceHeight / 2;
     const thirdWidth = this._pieceWidth / 3;
     const twoThirdsWidth = this._pieceWidth * (2 / 3);
 
-    this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndOuterBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates,
       twoThirdsWidth,
@@ -140,7 +120,8 @@ export class SPiece extends TetrisPiece {
       this.yCoordinates + halfHeight
     );
 
-    this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndOuterBorder(
+      context,
       this.xCoordinates - thirdWidth,
       this.yCoordinates + halfHeight,
       twoThirdsWidth,
@@ -150,39 +131,44 @@ export class SPiece extends TetrisPiece {
       this.xCoordinates,
       this.yCoordinates + this._pieceHeight
     );
+
+    return context;
   }
 
-  /**
-   * Clears the SPiece at 0-degree or 180-degree rotation.
-   */
-  private clearSPieceAt0Or180DegreeRotation(): void {
+  private clearSPieceAt0Or180DegreeRotation(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const halfHeight = this._pieceHeight / 2;
     const thirdWidth = this._pieceWidth / 3;
     const twoThirdsWidth = this._pieceWidth * (2 / 3);
 
-    this.clearPieceAndBorder(
+    context = this.clearPieceAndBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates,
       twoThirdsWidth,
       this._pieceHeight
     );
-    this.clearPieceAndBorder(
+    context = this.clearPieceAndBorder(
+      context,
       this.xCoordinates - thirdWidth,
       this.yCoordinates + halfHeight,
       twoThirdsWidth,
       this._pieceHeight
     );
+
+    return context;
   }
 
-  /**
-   * Draws the SPiece at 90-degree or 270-degree rotation.
-   */
-  private drawSPieceAt90Or270DegreeRotation(): void {
+  private drawSPieceAt90Or270DegreeRotation(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const halfWidth = this._pieceWidth / 2;
     const twoThirdsHeight = (this._pieceHeight * 2) / 3;
     const thirdHeight = this._pieceHeight / 3;
 
-    this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndOuterBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates,
       halfWidth,
@@ -193,7 +179,8 @@ export class SPiece extends TetrisPiece {
       this.yCoordinates + thirdHeight
     );
 
-    this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndOuterBorder(
+      context,
       this.xCoordinates + halfWidth,
       this.yCoordinates + thirdHeight,
       halfWidth,
@@ -203,38 +190,37 @@ export class SPiece extends TetrisPiece {
       this.xCoordinates + this._pieceWidth,
       this.yCoordinates + twoThirdsHeight
     );
+
+    return context;
   }
 
-  /**
-   * Clears the SPiece at 90-degree or 270-degree rotation.
-   */
-  private clearSPieceAt90Or270DegreeRotation(): void {
+  private clearSPieceAt90Or270DegreeRotation(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const halfWidth = this._pieceWidth / 2;
     const twoThirdsHeight = (this._pieceHeight * 2) / 3;
     const thirdHeight = this._pieceHeight / 3;
 
-    this.clearPieceAndBorder(
+    context = this.clearPieceAndBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates,
       this._pieceWidth,
       twoThirdsHeight
     );
 
-    this.clearPieceAndBorder(
+    context = this.clearPieceAndBorder(
+      context,
       this.xCoordinates + halfWidth,
       this.yCoordinates + thirdHeight,
       this._pieceWidth,
       twoThirdsHeight
     );
+
+    return context;
   }
 
-  /**
-   * Adjusts the new rotation coordinates to ensure they are within the canvas boundaries.
-   * @param newXCoordinates - The new x-coordinate after rotation.
-   * @param newYCoordinates - The new y-coordinate after rotation.
-   * @returns True if the move is possible, false otherwise.
-   */
-  override canMoveToCoordinates(
+  public override canMoveToCoordinates(
     xCoordinates: number,
     yCoordinates: number
   ): boolean {
@@ -244,16 +230,11 @@ export class SPiece extends TetrisPiece {
     return false;
   }
 
-  /**
-   * Sets the new coordinates after rotation and adjusts them if necessary.
-   * @param newXCoordinates - The new X coordinates.
-   * @param newYCoordinates - The new Y coordinates.
-   */
-  override setRotationNewCoordinates(
+  public override setRotationNewCoordinates(
     newXCoordinates: number,
     newYCoordinates: number
   ): void {
-    const canvasHeight = this._canvas!.canvas.height;
+    const canvasHeight = this._canvas.height;
 
     this.checkRotationNewXCoordinates(newXCoordinates);
 
@@ -264,12 +245,8 @@ export class SPiece extends TetrisPiece {
     this.yCoordinates = newYCoordinates;
   }
 
-  /**
-   * Checks and adjusts the new X coordinates after rotation.
-   * @param newXCoordinates - The new X coordinates.
-   */
   private checkRotationNewXCoordinates(newXCoordinates: number): void {
-    const canvasWidth = this._canvas!.canvas.width;
+    const canvasWidth = this._canvas.canvas.width;
 
     if (this._rotationDegree === 90 || this._rotationDegree === 270) {
       if (newXCoordinates < 0) newXCoordinates = 0;
@@ -286,12 +263,6 @@ export class SPiece extends TetrisPiece {
     this.xCoordinates = newXCoordinates;
   }
 
-  /**
-   * Checks if moving the piece is possible at 0 or 180 degree rotation.
-   * @param xCoordinates - The X coordinates to check.
-   * @param yCoordinates - The Y coordinates to check.
-   * @returns True if the move is possible, false otherwise.
-   */
   private moveIsPossibleAt00Or180DegreeRotation(
     xCoordinates: number,
     yCoordinates: number
@@ -299,19 +270,12 @@ export class SPiece extends TetrisPiece {
     const thirdWidth = this._pieceWidth / 3;
     return (
       xCoordinates - thirdWidth >= 0 &&
-      xCoordinates - thirdWidth <=
-        this._canvas!.canvas.width - this._pieceWidth &&
+      xCoordinates - thirdWidth <= this._canvas.width - this._pieceWidth &&
       yCoordinates >= 0 &&
-      yCoordinates <= this._canvas!.canvas.height - this._pieceHeight
+      yCoordinates <= this._canvas.height - this._pieceHeight
     );
   }
 
-  /**
-   * Checks if moving the piece is possible at 90 or 270 degree rotation.
-   * @param xCoordinates - The X coordinates to check.
-   * @param yCoordinates - The Y coordinates to check.
-   * @returns True if the move is possible, false otherwise.
-   */
   private moveIsPossibleAt90Or270DegreeRotation(
     xCoordinates: number,
     yCoordinates: number
@@ -319,10 +283,9 @@ export class SPiece extends TetrisPiece {
     const thirdWidth = this._pieceWidth / 3;
     return (
       xCoordinates >= 0 &&
-      xCoordinates - thirdWidth <=
-        this._canvas!.canvas.width - this._pieceWidth &&
+      xCoordinates - thirdWidth <= this._canvas.width - this._pieceWidth &&
       yCoordinates >= 0 &&
-      yCoordinates <= this._canvas!.canvas.height - this._pieceHeight
+      yCoordinates <= this._canvas.height - this._pieceHeight
     );
   }
 }
