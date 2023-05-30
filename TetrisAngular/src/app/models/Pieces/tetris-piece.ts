@@ -1,8 +1,6 @@
 import { TetrisInput } from 'src/app/interfaces/tetris-input';
+import { Canvas } from '../canvas';
 
-/**
- * Represents the rotation degree of a Tetris piece.
- */
 export enum RotationDegree {
   Degree0 = 0,
   Degree90 = 90,
@@ -11,80 +9,40 @@ export enum RotationDegree {
 }
 Object.freeze(RotationDegree);
 
-/**
- * Abstract base class representing a Tetris piece.
- * Provides common properties and methods for manipulating and drawing Tetris pieces on a canvas.
- * To create a specific Tetris piece, extend this class and implement the abstract methods.
- */
 export abstract class TetrisPiece implements TetrisInput {
-  /**
-   * The movement of the Tetris piece. The default movement is 20 units.
-   * A unit is equivalent to the size of the a grid cell.
-   */
   public movement: number = 20;
 
-  /**
-   * The total height of the Tetris piece.
-   */
   protected _pieceHeight: number = 0;
-
-  /**
-   * The total width of the Tetris piece.
-   */
   protected _pieceWidth: number = 0;
-
-  /**
-   * The roation degree of the Tetris piece. The default rotation degree is 0.
-   */
   protected _rotationDegree: RotationDegree = 0;
+  protected _context: CanvasRenderingContext2D | null = null;
 
   constructor(
-    /**
-     * The x-coordinate of the Tetris piece.
-     */
     protected _xCoordinates: number = 0,
-    /**
-     * The y-coordinate of the Tetris piece.
-     */
     protected _yCoordinates: number = 0,
-    /**
-     * The color of the Tetris piece. The default color is black.
-     */
     protected _pieceColor: string = 'black',
-    /**
-     * The canvas rendering context. In case of an invalid context, an error is thrown.
-     */
-    protected readonly _canvas: CanvasRenderingContext2D | null = null
+    protected readonly _canvas: Canvas
   ) {
-    if (_canvas) {
-      this._canvas = _canvas;
-      this._canvas.fillStyle = this._pieceColor;
-      this._canvas.lineWidth = 2;
-      this._canvas.strokeStyle = 'black';
-    } else {
-      throw new Error('Invalid canvas context.');
-    }
+    this._context = this._canvas.context;
+    this._canvas = _canvas;
+    this._context!.fillStyle = this._pieceColor;
+    this._context!.lineWidth = 2;
+    this._context!.strokeStyle = 'black';
   }
 
-  /**
-   * Draws the Tetris piece on the canvas.
-   * @param heightLength - The height of the Tetris piece.
-   * @param widthLength - The width of the Tetris piece.
-   * @returns The canvas rendering context.
-   */
   public abstract drawPiece(
+    context: CanvasRenderingContext2D,
     heightLength: number,
     widthLength: number
   ): CanvasRenderingContext2D;
 
-  /**
-   * Moves the Tetris piece down on the canvas.
-   * @param hardDrop - Indicates if the piece should be hard-dropped.
-   * @returns The canvas rendering context.
-   */
-  public movePieceDown(hardDrop: boolean = false): CanvasRenderingContext2D {
+  public movePieceDown(
+    context: CanvasRenderingContext2D,
+    hardDrop: boolean = false
+  ): CanvasRenderingContext2D {
     // TODO: Check if the piece can move down (if there is a piece below it)
     return this.movePiece(
+      context,
       this._xCoordinates,
       hardDrop
         ? this._canvas!.canvas.height - this._pieceHeight
@@ -92,18 +50,8 @@ export abstract class TetrisPiece implements TetrisInput {
     );
   }
 
-  /**
-   * Draws the Tetris piece and its border on the canvas.
-   * @param xCoordinates - The x-coordinate of the piece.
-   * @param yCoordinates - The y-coordinate of the piece.
-   * @param width - The width of the piece.
-   * @param height - The height of the piece.
-   * @param fromXLine - The x-coordinate of the starting point of the border line.
-   * @param fromYLine - The y-coordinate of the starting point of the border line.
-   * @param toXLine - The x-coordinate of the ending point of the border line.
-   * @param toYLine - The y-coordinate of the ending point of the border line.
-   */
   protected drawPieceAndOuterBorder(
+    context: CanvasRenderingContext2D,
     xCoordinates: number,
     yCoordinates: number,
     width: number,
@@ -112,9 +60,9 @@ export abstract class TetrisPiece implements TetrisInput {
     fromYLine?: number,
     toXLine?: number,
     toYLine?: number
-  ): void {
-    this._canvas!.fillRect(xCoordinates, yCoordinates, width, height);
-    this._canvas!.strokeRect(xCoordinates, yCoordinates, width, height);
+  ): CanvasRenderingContext2D {
+    context.fillRect(xCoordinates, yCoordinates, width, height);
+    context.strokeRect(xCoordinates, yCoordinates, width, height);
 
     if (
       fromXLine !== undefined &&
@@ -122,83 +70,65 @@ export abstract class TetrisPiece implements TetrisInput {
       toXLine !== undefined &&
       toYLine !== undefined
     ) {
-      this._canvas!.beginPath();
-      this._canvas!.moveTo(fromXLine, fromYLine);
-      this._canvas!.lineTo(toXLine, toYLine);
-      this._canvas!.stroke();
+      context.beginPath();
+      context.moveTo(fromXLine, fromYLine);
+      context.lineTo(toXLine, toYLine);
+      context.stroke();
     }
+
+    return context;
   }
 
-  /**
-   * Clears the Tetris piece and its border from the canvas.
-   * @param xCoordinates - The x-coordinate of the piece.
-   * @param yCoordinates - The y-coordinate of the piece.
-   * @param width - The width of the piece.
-   * @param height - The height of the piece.
-   */
   protected clearPieceAndBorder(
+    context: CanvasRenderingContext2D,
     xCoordinates: number,
     yCoordinates: number,
     width: number,
     height: number
-  ): void {
-    this._canvas!.clearRect(
+  ): CanvasRenderingContext2D {
+    context.clearRect(
       xCoordinates - 1,
       yCoordinates - 1,
       width + 2,
       height + 2
     );
+    return context;
   }
 
-  /**
-   * Moves the Tetris piece to the left on the canvas.
-   * @returns The canvas rendering context.
-   */
-  public movePieceLeft(): CanvasRenderingContext2D {
+  public movePieceLeft(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     return this.movePiece(
+      context,
       this._xCoordinates - this.movement,
       this._yCoordinates
     );
   }
 
-  /**
-   * Moves the Tetris piece to the right on the canvas.
-   * @returns The canvas rendering context.
-   */
-  public movePieceRight(): CanvasRenderingContext2D {
+  public movePieceRight(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     return this.movePiece(
+      context,
       this._xCoordinates + this.movement,
       this._yCoordinates
     );
   }
 
-  /**
-   * Moves the Tetris piece to the specified coordinates on the canvas.
-   * @param xCoordinates - The x-coordinate to move to.
-   * @param yCoordinates - The y-coordinate to move to.
-   * @returns The canvas rendering context.
-   */
   public movePiece(
+    context: CanvasRenderingContext2D,
     xCoordinates: number,
     yCoordinates: number
   ): CanvasRenderingContext2D {
     if (!this.canMoveToCoordinates(xCoordinates, yCoordinates))
-      return this._canvas!;
+      return this._context!;
 
-    this.clearPiecePreviousPosition();
+    context = this.clearPiecePreviousPosition(context);
     this.xCoordinates = xCoordinates;
     this.yCoordinates = yCoordinates;
-    this.drawPiece(this._pieceHeight, this._pieceWidth);
-
-    return this._canvas!;
+    return this.drawPiece(context, this._pieceHeight, this._pieceWidth);
   }
 
-  /**
-   * Checks if it is possible to move the Tetris piece to the specified coordinates.
-   * @param xCoordinates - The x-coordinate to check.
-   * @param yCoordinates - The y-coordinate to check.
-   * @returns True if the move is possible, false otherwise.
-   */
   public canMoveToCoordinates(
     xCoordinates: number,
     yCoordinates: number
@@ -211,25 +141,16 @@ export abstract class TetrisPiece implements TetrisInput {
     );
   }
 
-  /**
-   * Rotates the Tetris piece clockwise on the canvas.
-   * @returns The canvas rendering context.
-   */
-  public rotatePieceClockwise(): CanvasRenderingContext2D {
-    return this.rotatePiece();
+  public rotatePieceClockwise(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
+    return this.rotatePiece(context);
   }
 
-  /**
-   * Rotates the Tetris piece on the canvas.
-   * @returns The canvas rendering context.
-   */
-  protected abstract rotatePiece(): CanvasRenderingContext2D;
+  protected abstract rotatePiece(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D;
 
-  /**
-   * Adjusts the new rotation coordinates to ensure they are within the canvas boundaries.
-   * @param newXCoordinates - The new x-coordinate after rotation.
-   * @param newYCoordinates - The new y-coordinate after rotation.
-   */
   public setRotationNewCoordinates(
     newXCoordinates: number,
     newYCoordinates: number
@@ -249,48 +170,44 @@ export abstract class TetrisPiece implements TetrisInput {
     this.yCoordinates = newYCoordinates;
   }
 
-  /**
-   * Clears the entire canvas.
-   */
   public clearCanvas(): void {
-    this._canvas!.clearRect(
-      0,
-      0,
-      this._canvas?.canvas.width!,
-      this._canvas?.canvas.height!
-    );
+    const max = Number.MAX_SAFE_INTEGER;
+    this._context!.clearRect(0, 0, max, max);
   }
 
-  /**
-   * Clears the previous position of the Tetris piece on the canvas.
-   */
-  abstract clearPiecePreviousPosition(): void;
+  abstract clearPiecePreviousPosition(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D;
 
-  /**
-   * Getter for the x-coordinate of the Tetris piece.
-   */
   public get xCoordinates(): number {
     return this._xCoordinates;
   }
 
-  /**
-   * Setter for the x-coordinate of the Tetris piece.
-   */
   public set xCoordinates(xCoordinates: number) {
     this._xCoordinates = xCoordinates;
   }
 
-  /**
-   * Getter for the y-coordinate of the Tetris piece.
-   */
   public get yCoordinates(): number {
     return this._yCoordinates;
   }
 
-  /**
-   * Setter for the y-coordinate of the Tetris piece.
-   */
   public set yCoordinates(yCoordinates: number) {
     this._yCoordinates = yCoordinates;
+  }
+
+  public get pieceHeight(): number {
+    return this._pieceHeight;
+  }
+
+  public set pieceHeight(pieceHeight: number) {
+    this._pieceHeight = pieceHeight;
+  }
+
+  public get pieceWidth(): number {
+    return this._pieceWidth;
+  }
+
+  public set pieceWidth(pieceWidth: number) {
+    this._pieceWidth = pieceWidth;
   }
 }

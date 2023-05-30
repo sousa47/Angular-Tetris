@@ -1,1 +1,15 @@
-<app-game></app-game>
+<div class="container">
+  <div class="controls">
+  </div>
+  <div class="tetris-game">
+    <div class="tetris-holden-piece-container">
+      <app-hold-piece [holdThisPiece]="holdPiece"></app-hold-piece>
+    </div>
+    <div class="tetris-board-container">
+      <app-main-game></app-main-game>
+    </div>
+    <div class="tetris-next-pieces-container">
+      <app-next-pieces></app-next-pieces>
+    </div>
+  </div>
+</div>

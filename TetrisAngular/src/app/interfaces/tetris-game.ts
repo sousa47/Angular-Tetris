@@ -1,12 +1,11 @@
 import { TetrisPiece } from "../models/Pieces/tetris-piece";
 
 export interface TetrisGame {
-    canvas: HTMLCanvasElement;
     score: number;
     linesCleared: number;
     nextPieces: TetrisPiece[];
-    currentPiece: TetrisPiece;
-    holdPiece: TetrisPiece;
+    currentPiece: TetrisPiece | null;
+    holdPiece: TetrisPiece | null;
     generateNextPiece(): void;
     holdCurrentPiece(): void;
     clearLines(lines: number): void;

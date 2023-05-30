@@ -1,83 +1,65 @@
+import { Canvas } from '../../canvas';
 import { TetrisPiece, RotationDegree } from '../tetris-piece';
 
-/**
- * Represents the J-shaped Tetris piece.
- * Extends the base TetrisPiece class.
- */
 export class JPiece extends TetrisPiece {
-  /**
-   * Object containing the logic functions for drawing the piece based on rotation degree.
-   */
-  private rotationDrawPieceLogic: Record<RotationDegree, () => void> = {
+  private rotationDrawPieceLogic: Record<
+    RotationDegree,
+    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
+  > = {
     [0]: this.drawJPieceAt0DegreeRotation.bind(this),
     [90]: this.drawJPieceAt90DegreeRotation.bind(this),
     [180]: this.drawJPieceAt180DegreeRotation.bind(this),
     [270]: this.drawJPieceAt270DegreeRotation.bind(this),
   };
-
-  /**
-   * Object containing the logic functions for clear the piece based on rotation degree.
-   */
-  private rotationClearPieceLogic: Record<RotationDegree, () => void> = {
+  private rotationClearPieceLogic: Record<
+    RotationDegree,
+    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
+  > = {
     [0]: this.clearJPieceAt0DegreeRotation.bind(this),
     [90]: this.clearJPieceAt90DegreeRotation.bind(this),
     [180]: this.clearJPieceAt180DegreeRotation.bind(this),
     [270]: this.clearJPieceAt270DegreeRotation.bind(this),
   };
 
-  /**
-   * Creates a new J-shaped Tetris piece.
-   * @param {number} xCoordinates - The initial x-coordinate of the piece.
-   * @param {number} yCoordinates - The initial y-coordinate of the piece.
-   * @param {string} [color='blue'] - The color of the piece. Defaults to 'blue'.
-   * @param {CanvasRenderingContext2D | null} [canvas=null] - The canvas rendering context. Defaults to null.
-   */
   public constructor(
     xCoordinates: number,
     yCoordinates: number,
     color: string = 'blue',
-    canvas: CanvasRenderingContext2D | null = null
+    canvas: Canvas
   ) {
     super(xCoordinates, yCoordinates, color, canvas);
     this._rotationDegree = 0;
   }
 
-  /**
-   * Draws the JPiece on the canvas.
-   * @param {number} heightLength - The height length of the piece.
-   * @param {number} widthLength - The width length of the piece.
-   * @returns {CanvasRenderingContext2D} The rendering context of the canvas.
-   */
   public override drawPiece(
+    context: CanvasRenderingContext2D,
     heightLength: number,
     widthLength: number
   ): CanvasRenderingContext2D {
     this._pieceHeight = heightLength;
     this._pieceWidth = widthLength;
-    this._canvas!.fillStyle = this._pieceColor;
+    context.fillStyle = this._pieceColor;
 
     const rotationLogicFunction =
       this.rotationDrawPieceLogic[this._rotationDegree];
-    if (rotationLogicFunction) rotationLogicFunction();
+    if (rotationLogicFunction) context = rotationLogicFunction(context);
 
-    return this._canvas!;
+    return context;
   }
 
-  /**
-   * Clears the previous position of the JPiece on the canvas.
-   */
-  public override clearPiecePreviousPosition(): void {
+  public override clearPiecePreviousPosition(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const rotationLogicFunction =
       this.rotationClearPieceLogic[this._rotationDegree];
-    if (rotationLogicFunction) rotationLogicFunction();
+    if (rotationLogicFunction) context = rotationLogicFunction(context);
+    return context;
   }
 
-  /**
-   * Rotates the JPiece and redraws it on the canvas.
-   * @returns {CanvasRenderingContext2D} The rendering context of the canvas.
-   */
-  override rotatePiece(): CanvasRenderingContext2D {
-    this.clearPiecePreviousPosition();
+  public override rotatePiece(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
+    context = this.clearPiecePreviousPosition(context);
 
     const halfHeight = this._pieceHeight / 2;
     const halfWidth = this._pieceWidth / 2;
@@ -106,255 +88,276 @@ export class JPiece extends TetrisPiece {
     }
 
     this.setRotationNewCoordinates(newXCoordinates, newYCoordinates);
-    return this.drawPiece(this._pieceWidth, this._pieceHeight);
+    return this.drawPiece(context, this._pieceWidth, this._pieceHeight);
   }
 
-  /**
-   * Draws the JPiece at 0-degree rotation.
-   */
-  private drawJPieceAt0DegreeRotation(): void {
+  private drawJPieceAt0DegreeRotation(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const halfHeight = this._pieceHeight / 2;
     const thirdWidth = this._pieceWidth / 3;
     const twoThirdsWidth = this._pieceWidth * (2 / 3);
 
-    this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndOuterBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates + halfHeight,
       this._pieceWidth,
       halfHeight
     );
 
-    this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndOuterBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates,
       thirdWidth,
       halfHeight
     );
 
-    this._canvas!.beginPath();
-    this._canvas!.moveTo(
+    context.beginPath();
+    context.moveTo(
       this.xCoordinates + thirdWidth,
       this.yCoordinates + halfHeight
     );
-    this._canvas!.lineTo(
+    context.lineTo(
       this.xCoordinates + thirdWidth,
       this.yCoordinates + this._pieceHeight
     );
-    this._canvas!.moveTo(
+    context.moveTo(
       this.xCoordinates + twoThirdsWidth,
       this.yCoordinates + halfHeight
     );
-    this._canvas!.lineTo(
+    context.lineTo(
       this.xCoordinates + twoThirdsWidth,
       this.yCoordinates + this._pieceHeight
     );
-    this._canvas!.stroke();
+    context.stroke();
+
+    return context;
   }
 
-  /**
-   * Clears the JPiece at 0-degree rotation.
-   */
-  private clearJPieceAt0DegreeRotation(): void {
+  private clearJPieceAt0DegreeRotation(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const halfHeight = this._pieceHeight / 2;
     const thirdWidth = this._pieceWidth / 3;
 
-    this.clearPieceAndBorder(
+    context = this.clearPieceAndBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates + halfHeight,
       this._pieceWidth,
       halfHeight
     );
 
-    this.clearPieceAndBorder(
+    context = this.clearPieceAndBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates,
       thirdWidth,
       halfHeight
     );
+
+    return context;
   }
 
-  /**
-   * Draws the JPiece at 90-degree rotation.
-   */
-  private drawJPieceAt90DegreeRotation(): void {
+  private drawJPieceAt90DegreeRotation(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const halfWidth = this._pieceWidth / 2;
     const thirdHeight = this._pieceHeight / 3;
     const twoThirdsHeight = this._pieceHeight * (2 / 3);
 
-    this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndOuterBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates,
       halfWidth,
       this._pieceHeight
     );
 
-    this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndOuterBorder(
+      context,
       this.xCoordinates + halfWidth,
       this.yCoordinates,
       halfWidth,
       thirdHeight
     );
 
-    this._canvas!.beginPath();
-    this._canvas!.moveTo(this.xCoordinates, this.yCoordinates + thirdHeight);
-    this._canvas!.lineTo(
+    context.beginPath();
+    context.moveTo(this.xCoordinates, this.yCoordinates + thirdHeight);
+    context.lineTo(
       this.xCoordinates + halfWidth,
       this.yCoordinates + thirdHeight
     );
-    this._canvas!.moveTo(
-      this.xCoordinates,
-      this.yCoordinates + twoThirdsHeight
-    );
-    this._canvas!.lineTo(
+    context.moveTo(this.xCoordinates, this.yCoordinates + twoThirdsHeight);
+    context.lineTo(
       this.xCoordinates + halfWidth,
       this.yCoordinates + twoThirdsHeight
     );
-    this._canvas!.stroke();
+    context.stroke();
+
+    return context;
   }
 
-  /**
-   * Clears the JPiece at 90-degree rotation.
-   */
-  private clearJPieceAt90DegreeRotation(): void {
+  private clearJPieceAt90DegreeRotation(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const halfWidth = this._pieceWidth / 2;
     const thirdHeight = this._pieceHeight / 3;
 
-    this.clearPieceAndBorder(
+    context = this.clearPieceAndBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates,
       halfWidth,
       this._pieceHeight
     );
 
-    this.clearPieceAndBorder(
+    context = this.clearPieceAndBorder(
+      context,
       this.xCoordinates + halfWidth,
       this.yCoordinates,
       halfWidth,
       thirdHeight
     );
+
+    return context;
   }
 
-  /**
-   * Draws the JPiece at 180-degree rotation.
-   */
-  private drawJPieceAt180DegreeRotation(): void {
+  private drawJPieceAt180DegreeRotation(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const halfHeight = this._pieceHeight / 2;
     const thirdWidth = this._pieceWidth / 3;
     const twoThirdsWidth = this._pieceWidth * (2 / 3);
 
-    this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndOuterBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates,
       this._pieceWidth,
       halfHeight
     );
 
-    this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndOuterBorder(
+      context,
       this.xCoordinates + twoThirdsWidth,
       this.yCoordinates + halfHeight,
       thirdWidth,
       halfHeight
     );
 
-    this._canvas!.beginPath();
-    this._canvas!.moveTo(this.xCoordinates + thirdWidth, this.yCoordinates);
-    this._canvas!.lineTo(
+    context.beginPath();
+    context.moveTo(this.xCoordinates + thirdWidth, this.yCoordinates);
+    context.lineTo(
       this.xCoordinates + thirdWidth,
       this.yCoordinates + halfHeight
     );
-    this._canvas!.moveTo(this.xCoordinates + twoThirdsWidth, this.yCoordinates);
-    this._canvas!.lineTo(
+    context.moveTo(this.xCoordinates + twoThirdsWidth, this.yCoordinates);
+    context.lineTo(
       this.xCoordinates + twoThirdsWidth,
       this.yCoordinates + halfHeight
     );
-    this._canvas!.stroke();
+    context.stroke();
+
+    return context;
   }
 
-  /**
-   * Clears the JPiece at 180-degree rotation.
-   */
-  private clearJPieceAt180DegreeRotation(): void {
+  private clearJPieceAt180DegreeRotation(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const halfHeight = this._pieceHeight / 2;
     const thirdWidth = this._pieceWidth / 3;
     const twoThirdsWidth = this._pieceWidth * (2 / 3);
 
-    this.clearPieceAndBorder(
+    context = this.clearPieceAndBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates,
       this._pieceWidth,
       halfHeight
     );
 
-    this.clearPieceAndBorder(
+    context = this.clearPieceAndBorder(
+      context,
       this.xCoordinates + twoThirdsWidth,
       this.yCoordinates + halfHeight,
       thirdWidth,
       halfHeight
     );
+
+    return context;
   }
 
-  /**
-   * Draws the JPiece at 270-degree rotation.
-   */
-  private drawJPieceAt270DegreeRotation(): void {
+  private drawJPieceAt270DegreeRotation(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const halfWidth = this._pieceWidth / 2;
     const thirdHeight = this._pieceHeight / 3;
     const twoThirdsHeight = this._pieceHeight * (2 / 3);
 
-    this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndOuterBorder(
+      context,
       this.xCoordinates + halfWidth,
       this.yCoordinates,
       halfWidth,
       this._pieceHeight
     );
 
-    this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndOuterBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates + twoThirdsHeight,
       halfWidth,
       thirdHeight
     );
 
-    this._canvas!.beginPath();
-    this._canvas!.moveTo(
+    context.beginPath();
+    context.moveTo(
       this.xCoordinates + halfWidth,
       this.yCoordinates + thirdHeight
     );
-    this._canvas!.lineTo(
+    context.lineTo(
       this.xCoordinates + this._pieceWidth,
       this.yCoordinates + thirdHeight
     );
-    this._canvas!.moveTo(
+    context.moveTo(
       this.xCoordinates + halfWidth,
       this.yCoordinates + twoThirdsHeight
     );
-    this._canvas!.lineTo(
+    context.lineTo(
       this.xCoordinates + this._pieceWidth,
       this.yCoordinates + twoThirdsHeight
     );
-    this._canvas!.stroke();
+    context.stroke();
+
+    return context;
   }
 
-  /**
-   * Clears the JPiece at 270-degree rotation.
-   */
-  private clearJPieceAt270DegreeRotation(): void {
+  private clearJPieceAt270DegreeRotation(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const halfWidth = this._pieceWidth / 2;
     const thirdHeight = this._pieceHeight / 3;
     const twoThirdsHeight = this._pieceHeight * (2 / 3);
 
-    this.clearPieceAndBorder(
+    context = this.clearPieceAndBorder(
+      context,
       this.xCoordinates + halfWidth,
       this.yCoordinates,
       halfWidth,
       this._pieceHeight
     );
 
-    this.clearPieceAndBorder(
+    context = this.clearPieceAndBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates + twoThirdsHeight,
       halfWidth,
       thirdHeight
     );
+
+    return context;
   }
 }

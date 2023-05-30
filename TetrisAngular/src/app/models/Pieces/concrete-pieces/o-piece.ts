@@ -1,39 +1,24 @@
+import { Canvas } from '../../canvas';
 import { TetrisPiece } from '../tetris-piece';
 
-/**
- * Represents the O-shaped Tetris piece.
- * Extends the base TetrisPiece class.
- */
 export class OPiece extends TetrisPiece {
-  /**
-   * Creates a new O-shaped Tetris piece.
-   * @param {number} xCoordinates - The initial x-coordinate of the piece.
-   * @param {number} yCoordinates - The initial y-coordinate of the piece.
-   * @param {string} [color='yellow'] - The color of the piece. Defaults to 'yellow'.
-   * @param {CanvasRenderingContext2D | null} [canvas=null] - The canvas rendering context. Defaults to null.
-   */
   public constructor(
     xCoordinates: number,
     yCoordinates: number,
     color: string = 'yellow',
-    canvas: CanvasRenderingContext2D | null = null
+    canvas: Canvas
   ) {
     super(xCoordinates, yCoordinates, color, canvas);
   }
 
-  /**
-   * Draws the O-shaped piece on the canvas.
-   * @param heightLength The height of the piece.
-   * @param widthLength The width of the piece.
-   * @returns The canvas context after drawing the piece.
-   */
   public override drawPiece(
+    context: CanvasRenderingContext2D,
     heightLength: number,
     widthLength: number
   ): CanvasRenderingContext2D {
     this._pieceHeight = heightLength;
     this._pieceWidth = widthLength;
-    this._canvas!.fillStyle = this._pieceColor;
+    context.fillStyle = this._pieceColor;
 
     const squareSize = Math.min(this._pieceHeight, this._pieceWidth);
     const squareXCoordinates =
@@ -41,48 +26,44 @@ export class OPiece extends TetrisPiece {
     const squareYCoordinates =
       this.yCoordinates + (this._pieceHeight - squareSize) / 2;
 
-    this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndOuterBorder(
+      context,
       squareXCoordinates,
       squareYCoordinates,
       squareSize,
       squareSize
     );
-    this.drawPieceInnerBorders();
+    context = this.drawPieceInnerBorders(context);
 
-    return this._canvas!;
+    return context;
   }
 
-  /**
-   * Draws the inner lines of the piece.
-   */
-  private drawPieceInnerBorders(): void {
+  private drawPieceInnerBorders(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     const size = Math.min(this._pieceHeight, this._pieceWidth);
     const halfSize = size / 2;
 
     // Draw horizontal inner line.
-    this._canvas!.beginPath();
-    this._canvas!.moveTo(this.xCoordinates, this.yCoordinates + halfSize);
-    this._canvas!.lineTo(
-      this.xCoordinates + size,
-      this.yCoordinates + halfSize
-    );
-    this._canvas!.stroke();
+    context.beginPath();
+    context.moveTo(this.xCoordinates, this.yCoordinates + halfSize);
+    context.lineTo(this.xCoordinates + size, this.yCoordinates + halfSize);
+    context.stroke();
 
     // Draw vertical inner line.
-    this._canvas!.beginPath();
-    this._canvas!.moveTo(this.xCoordinates + halfSize, this.yCoordinates);
-    this._canvas!.lineTo(
-      this.xCoordinates + halfSize,
-      this.yCoordinates + size
-    );
-    this._canvas!.stroke();
+    context.beginPath();
+    context.moveTo(this.xCoordinates + halfSize, this.yCoordinates);
+    context.lineTo(this.xCoordinates + halfSize, this.yCoordinates + size);
+    context.stroke();
+
+    return context;
   }
 
-  /**
-   * Clears the previous position of the piece on the canvas.
-   */
-  public override clearPiecePreviousPosition(): void {
-    this.clearPieceAndBorder(
+  public override clearPiecePreviousPosition(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
+    return this.clearPieceAndBorder(
+      context,
       this.xCoordinates,
       this.yCoordinates,
       this._pieceWidth,
@@ -90,12 +71,10 @@ export class OPiece extends TetrisPiece {
     );
   }
 
-  /**
-   * Rotates the piece.
-   * @returns The canvas context after rotating the piece.
-   */
-  override rotatePiece(): CanvasRenderingContext2D {
+  public override rotatePiece(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
     // Since this is a square, it doesn't truly rotate.
-    return this._canvas!;
+    return context;
   }
 }
