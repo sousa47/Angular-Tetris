@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { TetrisPiece } from 'src/app/models/Pieces/tetris-piece';
+import { TetrisPiece } from 'src/app/models/pieces/tetris-piece';
 import { TetrisPieceObjectService } from '../tetris-piece-object/tetris-piece-object.service';
 
 @Injectable({

@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { OPiece } from 'src/app/models/Pieces/concrete-pieces/o-piece';
-import { IPiece } from 'src/app/models/Pieces/concrete-pieces/i-piece';
-import { TPiece } from 'src/app/models/Pieces/concrete-pieces/t-piece';
-import { LPiece } from 'src/app/models/Pieces/concrete-pieces/l-piece';
-import { JPiece } from 'src/app/models/Pieces/concrete-pieces/j-piece';
-import { SPiece } from 'src/app/models/Pieces/concrete-pieces/s-piece';
-import { ZPiece } from 'src/app/models/Pieces/concrete-pieces/z-piece';
-import { TetrisPiece } from 'src/app/models/Pieces/tetris-piece';
+import { OPiece } from 'src/app/models/pieces/concrete-pieces/o-piece';
+import { IPiece } from 'src/app/models/pieces/concrete-pieces/i-piece';
+import { TPiece } from 'src/app/models/pieces/concrete-pieces/t-piece';
+import { LPiece } from 'src/app/models/pieces/concrete-pieces/l-piece';
+import { JPiece } from 'src/app/models/pieces/concrete-pieces/j-piece';
+import { SPiece } from 'src/app/models/pieces/concrete-pieces/s-piece';
+import { ZPiece } from 'src/app/models/pieces/concrete-pieces/z-piece';
+import { TetrisPiece } from 'src/app/models/pieces/tetris-piece';
 import { Canvas } from 'src/app/models/canvas';
 
 @Injectable({

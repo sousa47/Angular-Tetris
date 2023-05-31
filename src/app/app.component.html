@@ -1,9 +1,34 @@
+<h1 class="title">{{ title }}</h1>
 <div class="container">
   <div class="controls">
+    <div class="control">
+      <button class="btn btn-primary control-key" disabled>W</button>
+      {{ tutorialW }}
+    </div>
+    <div class="control">
+      <button class="btn btn-primary control-key" disabled>A</button>
+      {{ tutorialA }}
+    </div>
+    <div class="control">
+      <button class="btn btn-primary control-key" disabled>S</button>
+      {{ tutorialS }}
+    </div>
+    <div class="control">
+      <button class="btn btn-primary control-key" disabled>D</button>
+      {{ tutorialD }}
+    </div>
+    <div class="control">
+      <button class="btn btn-primary control-key" disabled>E</button>
+      {{ tutorialE }}
+    </div>
+    <div class="control">
+      <button class="btn btn-primary control-key" disabled>F</button>
+      {{ tutorialF }}
+    </div>
   </div>
   <div class="tetris-game">
     <div class="tetris-holden-piece-container">
-      <app-hold-piece [holdThisPiece]="holdPiece"></app-hold-piece>
+      <app-hold-piece></app-hold-piece>
     </div>
     <div class="tetris-board-container">
       <app-main-game></app-main-game>
@@ -11,5 +36,14 @@
     <div class="tetris-next-pieces-container">
       <app-next-pieces></app-next-pieces>
     </div>
+  </div>
+</div>
+<div class="game-start">
+  <div class="start">
+    <button id="start-button" class="btn btn-primary start-button" (click)="start()">Start Game</button>
+  </div>
+  <div class="score">
+    <div class="score-title">Score:</div>
+    <div class="score-value">{{ score }}</div>
   </div>
 </div>

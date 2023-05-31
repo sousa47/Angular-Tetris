@@ -1,4 +1,4 @@
-import { TetrisPiece } from "../models/Pieces/tetris-piece";
+import { TetrisPiece } from "../models/pieces/tetris-piece";
 
 export interface TetrisGame {
     score: number;
