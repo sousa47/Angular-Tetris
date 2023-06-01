@@ -1,24 +1,10 @@
 import { Injectable } from '@angular/core';
-import { TetrisPiece } from 'src/app/models/pieces/tetris-piece';
-import { ObservableTetrisPieceService } from '../observable-tetris-piece/observable-tetris-piece.service';
-import { TetrisPieceObjectService } from '../tetris-piece/tetris-piece-object/tetris-piece-object.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class NextPiecesService {
   private nextPiecesImageSources: string[] = [];
-
-  constructor(
-    private _observableTetrisPieceService: ObservableTetrisPieceService,
-    private _tetrisPieeceObjectService: TetrisPieceObjectService
-  ) {
-    _observableTetrisPieceService.currentTetrisPieceSubject.subscribe(
-      (piece: TetrisPiece | null) => {
-        if (piece === null) this.setNextPiece();
-      }
-    );
-  }
 
   public get nextPiecesImageSourceArray(): string[] {
     return this.nextPiecesImageSources.map((piece) => `${piece}_image.png`);
@@ -34,7 +20,7 @@ export class NextPiecesService {
 
   public setNextPiece(): string {
     const nextPieceImageSource: string = this.nextPiecesImageSources.shift()!;
-    const nextPiece = this.randomPiece();
+    const nextPiece = nextPieceImageSource.split('/images/')[1];
     this.nextPiecesImageSources.push(`../assets/images/${nextPiece}`);
     return nextPiece;
   }

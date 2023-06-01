@@ -49,18 +49,15 @@ export class TetrisPieceObjectService {
     return this._tetrisPieces[1];
   }
 
-
   public get LPiece(): TetrisPiece {
     this.createLPiece();
     return this._tetrisPieces[2];
   }
 
   public get OPiece(): TetrisPiece {
-    // this._tetrisPieces[3] = undefined;
     this.createOPiece();
     return this._tetrisPieces[3];
   }
-
 
   public get SPiece(): TetrisPiece {
     this.createSPiece();
@@ -72,12 +69,10 @@ export class TetrisPieceObjectService {
     return this._tetrisPieces[5];
   }
 
-
   public get ZPiece(): TetrisPiece {
     this.createZPiece();
     return this._tetrisPieces[6];
   }
-
 
   private generatePieces(): void {
     this.createIPiece();

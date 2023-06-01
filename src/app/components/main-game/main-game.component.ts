@@ -33,37 +33,21 @@ export class MainGameComponent implements AfterViewInit {
   private _canvasContext: CanvasRenderingContext2D | null = null;
   private _canHoldPiece: boolean = true;
   private _canvas: Canvas | undefined;
+  private _canvasGridUnit: number = 40;
 
   private _gameLoop: boolean = true;
-  private _gameSpeed = 1000;
+  private _gameSpeed = 2000;
+  private _gameLoopInterval: any = undefined;
   private _previousPieceXPosition: number = 0;
   private _previousPieceYPosition: number = 0;
 
   public constructor(
     private _tetrisPieceDrawingService: TetrisPieceDrawingService,
     private _observableTetrisPieceService: ObservableTetrisPieceService,
-    private _tetrisCollisionService: TetrisCollisionService
+    private _tetrisCollisionService: TetrisCollisionService,
+    private _gameService: GameService
   ) {
-    _observableTetrisPieceService.currentTetrisPieceSubject.subscribe(
-      (currentPiece: TetrisPiece | null) => {
-        console.log(currentPiece);
-        if (currentPiece === null) return;
-        this._currentPiece = currentPiece;
-        this.drawPiece();
-      }
-    );
-
-    _observableTetrisPieceService.startGameSubject.subscribe(
-      (value: boolean) => {
-        if (value && this._gameLoop) {
-          this._gameSpeed = 1000;
-          this.startGameLoop();
-        } else {
-          this._gameSpeed = 0;
-          this._gameLoop = false;
-        }
-      }
-    );
+    this.setObservableTetrisPieceService();
   }
 
   public ngAfterViewInit(): void {
@@ -73,41 +57,60 @@ export class MainGameComponent implements AfterViewInit {
       this._canvas;
 
     this._tetrisCollisionService.gridScale = this._canvas.gridUnit;
+    this._canvasGridUnit = this._canvas.gridUnit;
+  }
+
+  private setObservableTetrisPieceService(): void {
+    this._observableTetrisPieceService.currentTetrisPieceSubject.subscribe(
+      (currentPiece: TetrisPiece | null) => {
+        if (currentPiece === null || currentPiece === undefined) return;
+        this._currentPiece = currentPiece;
+        this.drawPiece();
+      }
+    );
+
+    this._observableTetrisPieceService.startGameSubject.subscribe(
+      (value: boolean) => {
+        if (value && this._gameLoop) {
+          this._gameSpeed = 2000;
+          this.startGameLoop();
+        } else {
+          this._gameSpeed = 0;
+          this._gameLoop = false;
+        }
+      }
+    );
+
+    this._observableTetrisPieceService.linesClearedSubject.subscribe(
+      (value: number[]) => this.clearLines(value)
+    );
   }
 
   public movePieceRight(): void {
-    const newContext =
-      this._currentPiece!.movePieceRight(this._canvasContext!) || null;
-
-    this.setNewContext(newContext);
+    if (this.checkCollision('right')) return;
+    this._currentPiece!.movePieceRight(this._canvasContext!) || null;
   }
 
   public movePieceLeft(): void {
-    const newContext =
-      this._currentPiece!.movePieceLeft(this._canvasContext!) || null;
-
-    this.setNewContext(newContext);
+    if (this.checkCollision('left')) return;
+    this._currentPiece!.movePieceLeft(this._canvasContext!) || null;
   }
 
   public movePieceDown(): void {
-    const newContext =
-      this._currentPiece!.movePieceDown(this._canvasContext!) || null;
-
-    this.setNewContext(newContext);
+    if (this.checkCollision('down')) return;
+    this._currentPiece!.movePieceDown(this._canvasContext!) || null;
   }
 
   public movePieceDownhardDrop(): void {
-    const newContext =
-      this._currentPiece!.movePieceDown(this._canvasContext!, true) || null;
-
-    this.setNewContext(newContext);
+    while (!this.checkCollision('down')) {
+      this._currentPiece!.movePieceDown(this._canvasContext!) || null;
+    }
+    this.nextPiece();
   }
 
   public rotatePiece(): void {
-    const newContext =
-      this._currentPiece!.rotatePieceClockwise(this._canvasContext!) || null;
-
-    this.setNewContext(newContext);
+    // check collision before rotating
+    this._currentPiece!.rotatePieceClockwise(this._canvasContext!) || null;
   }
 
   public holdCurrentPiece(): void {
@@ -121,7 +124,7 @@ export class MainGameComponent implements AfterViewInit {
       this._currentPiece = holdenPiece;
       this.drawPiece();
     } else {
-      // next piece;
+      this.nextPiece();
     }
   }
 
@@ -140,9 +143,12 @@ export class MainGameComponent implements AfterViewInit {
   }
 
   private startGameLoop(): void {
-    setInterval(() => {
+    if (this._gameLoopInterval !== undefined) return;
+
+    this._gameLoopInterval = setInterval(() => {
       if (!this.checkIfPieceMoved()) {
         this.nextPiece();
+        return;
       }
 
       if (this._currentPiece && this._gameSpeed != 0) {
@@ -152,13 +158,12 @@ export class MainGameComponent implements AfterViewInit {
   }
 
   private nextPiece(): void {
-    // this._gameService.nextPiece();
     this._tetrisCollisionService.addPieceToBoard(
       this._currentPiece?.xCoordinates!,
-      this._currentPiece?.yCoordinates!
+      this._currentPiece?.yCoordinates!,
+      this._currentPiece!
     );
-    this._currentPiece = this.nextGamePieceLogic['OPiece']();
-    this.drawPiece();
+    this._gameService.nextPiece();
   }
 
   private checkIfPieceMoved(): boolean {
@@ -173,16 +178,34 @@ export class MainGameComponent implements AfterViewInit {
     return true;
   }
 
-  private checkCollision(): boolean {
+  private checkCollision(direction: 'down' | 'left' | 'right'): boolean {
     return this._tetrisCollisionService.checkCollision(
       this._currentPiece?.xCoordinates!,
-      this._currentPiece?.yCoordinates!
+      this._currentPiece?.yCoordinates!,
+      direction,
+      this._currentPiece!
     );
   }
 
-  private setNewContext(context: CanvasRenderingContext2D): void {
-    if (this.checkCollision()) this.nextPiece();
-    this._canvasContext = context;
+  private clearLines(lines: number[]): void {
+    const numberOfLines = lines.length;
+
+    for (let i = 0; i < numberOfLines; i++) {
+      this._canvasContext?.clearRect(
+        0,
+        lines[i] * this._canvasGridUnit - 1,
+        this._canvasContext.canvas.width,
+        this._canvasGridUnit + 2
+      );
+    }
+
+    // move all lines above cleared lines down -> check this
+    this._canvasContext!.save();
+    this._canvasContext!.translate(0, this._canvasGridUnit * numberOfLines);
+    this._canvasContext!.drawImage(this._canvas?.canvas!, 0, 0);
+    this._canvasContext!.restore();
+
+    this._gameService.addScore(numberOfLines * numberOfLines);
   }
 
   @HostListener('document:keyup', ['$event'])
@@ -190,21 +213,4 @@ export class MainGameComponent implements AfterViewInit {
     const inputLogicFuntion = this.inputLogic[event.key];
     if (inputLogicFuntion) inputLogicFuntion();
   }
-
-  private nextGamePieceLogic: Record<string, () => TetrisPiece> = {
-    ['IPiece']: () =>
-      this._tetrisPieceDrawingService.tetrisPieceObjectService.IPiece,
-    ['JPiece']: () =>
-      this._tetrisPieceDrawingService.tetrisPieceObjectService.JPiece,
-    ['LPiece']: () =>
-      this._tetrisPieceDrawingService.tetrisPieceObjectService.LPiece,
-    ['OPiece']: () =>
-      this._tetrisPieceDrawingService.tetrisPieceObjectService.OPiece,
-    ['SPiece']: () =>
-      this._tetrisPieceDrawingService.tetrisPieceObjectService.SPiece,
-    ['TPiece']: () =>
-      this._tetrisPieceDrawingService.tetrisPieceObjectService.TPiece,
-    ['ZPiece']: () =>
-      this._tetrisPieceDrawingService.tetrisPieceObjectService.ZPiece,
-  };
 }

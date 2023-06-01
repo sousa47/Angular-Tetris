@@ -4,14 +4,13 @@ import { Canvas } from 'src/app/models/canvas';
 import { TetrisPieceDrawingService } from 'src/app/services/tetris-piece/tetris-piece-drawing/tetris-piece-drawing.service';
 import { ObservableTetrisPieceService } from 'src/app/services/observable-tetris-piece/observable-tetris-piece.service';
 
-
 @Component({
   selector: 'app-hold-piece',
   templateUrl: './hold-piece.component.html',
   styleUrls: ['./hold-piece.component.css'],
 })
 export class HoldPieceComponent implements AfterViewInit {
-  @ViewChild('randomy', { static: true })
+  @ViewChild('holdPieceCanvas', { static: true })
   canvas!: ElementRef<HTMLCanvasElement>;
 
   private _canvas: CanvasRenderingContext2D | null = null;
@@ -30,7 +29,6 @@ export class HoldPieceComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    /*
     this._canvas = this.canvas.nativeElement.getContext('2d');
 
     const canvasHalfHeight = this._canvas!.canvas.height / 2;
@@ -41,7 +39,6 @@ export class HoldPieceComponent implements AfterViewInit {
       canvasHalfHeight
     );
     this._tetrisPieceDrawingService.tetrisPieceObjectService.canvas = canvas;
-    */
   }
 
   private holdPiece(pieceToHold: TetrisPiece): void {
@@ -61,7 +58,6 @@ export class HoldPieceComponent implements AfterViewInit {
 
   private postionPiece(): void {
     this._canvas!.clearRect(0, 0, 2000, 2000);
-    this._currentHoldPiece!.clearCanvas();
     this._currentHoldPiece!.movePiece(this._canvas!, 0, 0);
 
     const setPieceCenterFunction =

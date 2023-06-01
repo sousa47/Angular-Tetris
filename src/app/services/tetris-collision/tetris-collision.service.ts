@@ -1,4 +1,7 @@
 import { Injectable } from '@angular/core';
+import { ObservableTetrisPieceService } from '../observable-tetris-piece/observable-tetris-piece.service';
+import { TetrisPiece } from 'src/app/models/pieces/tetris-piece';
+import { OPieceCollision } from './pieces-collisions/o-piece-collision';
 
 @Injectable({
   providedIn: 'root',
@@ -7,7 +10,25 @@ export class TetrisCollisionService {
   private _tetrisBoard: number[][] = [];
   private _gridScale: number = 40;
 
-  constructor() {
+  private addPieceToBoardLogic: Record<
+    string,
+    (x: number, y: number) => number[][]
+  > = {
+    ['OPiece']: (x, y) =>
+      OPieceCollision.addPieceToBoard(this._tetrisBoard, x, y),
+  };
+
+  private checkPieceForCollisionLogic: Record<
+    string,
+    (x: number, y: number, direction: 'down' | 'left' | 'right') => boolean
+  > = {
+    ['OPiece']: (x, y, direction) =>
+      OPieceCollision.checkCollision(this._tetrisBoard, x, y, direction),
+  };
+
+  constructor(
+    private _observableTetrisPieceService: ObservableTetrisPieceService
+  ) {
     this.setTetrisBoard();
   }
 
@@ -15,49 +36,59 @@ export class TetrisCollisionService {
     this._gridScale = scale;
   }
 
-  public addPieceToBoard(xCoordinates: number, yCoordinates: number): void {
+  public addPieceToBoard(
+    xCoordinates: number,
+    yCoordinates: number,
+    piece: TetrisPiece
+  ): void {
     const x = Math.floor(yCoordinates / this._gridScale);
     const y = Math.floor(xCoordinates / this._gridScale);
 
-    this.addSquarePieceToArray(x, y);
+    this._tetrisBoard = this.addPieceToBoardLogic[piece.constructor.name](x, y);
+    this.checkForLineClear();
   }
 
-  public checkCollision(xCoordinates: number, yCoordinates: number): boolean {
+  public checkCollision(
+    xCoordinates: number,
+    yCoordinates: number,
+    direction: 'down' | 'left' | 'right',
+    piece: TetrisPiece
+  ): boolean {
     const x = Math.floor(yCoordinates / this._gridScale);
     const y = Math.floor(xCoordinates / this._gridScale);
 
-    return this.checkSquareCollison(x, y);
-  }
-
-  private addSquarePieceToArray(x: number, y: number): void {
-    this._tetrisBoard[x][y] = 1;
-    this._tetrisBoard[x + 1][y] = 1;
-    this._tetrisBoard[x][y + 1] = 1;
-    this._tetrisBoard[x + 1][y + 1] = 1;
-  }
-
-  private checkSquareCollison(x: number, y: number): boolean {
-    var check = false;
-    try {
-      check =
-        this._tetrisBoard[x + 2][y] === 1 ||
-        this._tetrisBoard[x + 2][y + 1] === 1 ||
-        this._tetrisBoard[x][y] === 1 ||
-        this._tetrisBoard[x][y + 1] === 1;
-    } catch {
-      // ignored, out of bounds of array
-    }
-
-    return check;
+    return this.checkPieceForCollisionLogic[piece.constructor.name](
+      x,
+      y,
+      direction
+    );
   }
 
   private setTetrisBoard(): void {
-    this._tetrisBoard = Array.from(Array(20), () => new Array(10));
+    this._tetrisBoard = Array.from(Array(20).fill(0), () =>
+      new Array(10).fill(0)
+    );
+  }
+
+  private checkForLineClear(): void {
+    const linesToClear: number[] = [];
     for (let x = 0; x < 20; x++) {
-      this._tetrisBoard[x] = [];
       for (let y = 0; y < 10; y++) {
-        this._tetrisBoard[x][y] = 0;
+        if (this._tetrisBoard[x][y] === 0) break;
+        if (y === 9) linesToClear.push(x);
       }
     }
+    this.clearLine(linesToClear);
+  }
+
+  private clearLine(lines: number[]): void {
+    if (lines.length === 0) return;
+
+    for (let i = 0; i < lines.length; i++) {
+      this._tetrisBoard.splice(lines[i], 1);
+      this._tetrisBoard.unshift(new Array(10).fill(0));
+    }
+
+    this._observableTetrisPieceService.linesCleared = lines;
   }
 }

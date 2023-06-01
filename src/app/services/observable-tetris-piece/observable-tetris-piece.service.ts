@@ -16,6 +16,8 @@ export class ObservableTetrisPieceService {
 
   public readonly startGameSubject = new Subject<boolean>();
 
+  public readonly linesClearedSubject = new Subject<number[]>();
+
   public set currentTetrisPiece(piece: TetrisPiece | null) {
     if (this.firstOccurenceCurrentTetrisPieceSubject) {
       this.firstOccurenceCurrentTetrisPieceSubject = false;
@@ -29,8 +31,6 @@ export class ObservableTetrisPieceService {
   }
 
   public set holdenTetrisPiece(piece: TetrisPiece | null) {
-
-    console.log(this.currentTetrisPieceObject);
     if (this.firstOccurenceHoldenTetrisPieceSubject) {
       this.firstOccurenceHoldenTetrisPieceSubject = false;
       this.holdenTetrisPieceSubject.next(null);
@@ -45,5 +45,9 @@ export class ObservableTetrisPieceService {
 
   public set startGame(value: boolean) {
     this.startGameSubject.next(value);
+  }
+
+  public set linesCleared(value: number[]) {
+    this.linesClearedSubject.next(value);
   }
 }
