@@ -229,4 +229,8 @@ export abstract class TetrisPiece implements TetrisInput {
   public set canvas(canvas: Canvas) {
     this._canvas = canvas;
   }
+
+  public get currentRotationDegree(): RotationDegree {
+    return this._rotationDegree;
+  }
 }

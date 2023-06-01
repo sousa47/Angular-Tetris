@@ -1,5 +1,5 @@
 import { Canvas } from '../../canvas';
-import { TetrisPiece, RotationDegree } from '../tetris-piece';
+import { TetrisPiece } from '../tetris-piece';
 
 export class IPiece extends TetrisPiece {
   private _numberOfSections = 4;
@@ -11,7 +11,7 @@ export class IPiece extends TetrisPiece {
     canvas: Canvas
   ) {
     super(xCoordinates, yCoordinates, color, canvas);
-    this._rotationDegree = RotationDegree.Degree90;
+    this._rotationDegree = 90;
   }
 
   public override drawPiece(
@@ -23,15 +23,48 @@ export class IPiece extends TetrisPiece {
     this._pieceWidth = widthLength;
     context.fillStyle = this._pieceColor;
 
-    context = this.drawPieceAndOuterBorder(
-      context,
-      this.xCoordinates,
-      this.yCoordinates,
-      widthLength,
-      heightLength
-    );
+    context =
+      this._rotationDegree % 180 === 0
+        ? this.drawPieceHorizontal(context)
+        : this.drawPieceVertical(context);
 
     context = this.drawInnerBorder(context);
+
+    return context;
+  }
+
+  private drawPieceHorizontal(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
+    const sectionLength = this._pieceWidth / this._numberOfSections;
+
+    for (let i = 0; i < this._numberOfSections; i++) {
+      context = this.drawPieceAndOuterBorder(
+        context,
+        this.xCoordinates + sectionLength * i,
+        this.yCoordinates,
+        sectionLength,
+        this._pieceHeight
+      );
+    }
+
+    return context;
+  }
+
+  private drawPieceVertical(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D {
+    const sectionLength = this._pieceHeight / this._numberOfSections;
+
+    for (let i = 0; i < this._numberOfSections; i++) {
+      context = this.drawPieceAndOuterBorder(
+        context,
+        this.xCoordinates,
+        this.yCoordinates + sectionLength * i,
+        this._pieceWidth,
+        sectionLength
+      );
+    }
 
     return context;
   }

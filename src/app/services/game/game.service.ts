@@ -26,7 +26,7 @@ export class GameService {
 
   public startGame(): void {
     this._observableTetrisPiece.startGame = true;
-    const startingPiece = this._tetrisPieceObjectService.OPiece;
+    const startingPiece = this._tetrisPieceObjectService.JPiece;
     this._observableTetrisPiece.currentTetrisPiece = startingPiece;
   }
 
@@ -37,7 +37,7 @@ export class GameService {
   public nextPiece(): void {
     const nextPiece = this._nextPiecesService.setNextPiece();
     this._observableTetrisPiece.currentTetrisPiece =
-      this.nextGamePieceLogic['OPiece']();
+      this.nextGamePieceLogic['JPiece']();
   }
 
   public addScore(score: number): void {

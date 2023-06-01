@@ -1,8 +1,11 @@
+import { TetrisPiece } from 'src/app/models/pieces/tetris-piece';
+
 export class OPieceCollision {
   public static addPieceToBoard(
     currentBoard: number[][],
     x: number,
-    y: number
+    y: number,
+    piece: TetrisPiece
   ): number[][] {
     currentBoard[x][y] = 1;
     currentBoard[x + 1][y] = 1;
@@ -16,7 +19,8 @@ export class OPieceCollision {
     currentBoard: number[][],
     x: number,
     y: number,
-    direction: 'down' | 'left' | 'right'
+    direction: 'down' | 'left' | 'right',
+    piece: TetrisPiece
   ): boolean {
     try {
       switch (direction) {

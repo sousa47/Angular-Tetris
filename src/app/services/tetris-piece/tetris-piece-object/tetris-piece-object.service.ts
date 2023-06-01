@@ -36,7 +36,7 @@ export class TetrisPieceObjectService {
 
   get randomPiece(): TetrisPiece {
     if (this._tetrisPieces.length === 0) this.generatePieces();
-    return this._tetrisPieces[(3 | this._tetrisPieces.length * Math.random()) | 0];
+    return this._tetrisPieces[(2 | this._tetrisPieces.length * Math.random()) | 0];
   }
 
   public get IPiece(): TetrisPiece {

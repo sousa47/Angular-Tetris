@@ -146,14 +146,8 @@ export class MainGameComponent implements AfterViewInit {
     if (this._gameLoopInterval !== undefined) return;
 
     this._gameLoopInterval = setInterval(() => {
-      if (!this.checkIfPieceMoved()) {
-        this.nextPiece();
-        return;
-      }
-
-      if (this._currentPiece && this._gameSpeed != 0) {
-        this.movePieceDown();
-      }
+      if (this._currentPiece && this._gameSpeed != 0) this.movePieceDown();
+      if (!this.checkIfPieceMoved()) this.nextPiece();
     }, this._gameSpeed);
   }
 

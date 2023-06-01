@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { ObservableTetrisPieceService } from '../observable-tetris-piece/observable-tetris-piece.service';
 import { TetrisPiece } from 'src/app/models/pieces/tetris-piece';
 import { OPieceCollision } from './pieces-collisions/o-piece-collision';
+import { IPieceCollision } from './pieces-collisions/i-piece-collision';
+import { LPieceCollision } from './pieces-collisions/l-piece-collision';
+import { JPieceCollision } from './pieces-collisions/j-piece-collision';
 
 @Injectable({
   providedIn: 'root',
@@ -12,18 +15,35 @@ export class TetrisCollisionService {
 
   private addPieceToBoardLogic: Record<
     string,
-    (x: number, y: number) => number[][]
+    (x: number, y: number, piece: TetrisPiece) => number[][]
   > = {
-    ['OPiece']: (x, y) =>
-      OPieceCollision.addPieceToBoard(this._tetrisBoard, x, y),
+    ['IPiece']: (x, y, piece) =>
+      IPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
+    ['JPiece']: (x, y, piece) =>
+      JPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
+    ['LPiece']: (x, y, piece) =>
+      LPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
+    ['OPiece']: (x, y, piece) =>
+      OPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
   };
 
   private checkPieceForCollisionLogic: Record<
     string,
-    (x: number, y: number, direction: 'down' | 'left' | 'right') => boolean
+    (
+      x: number,
+      y: number,
+      direction: 'down' | 'left' | 'right',
+      piece: TetrisPiece
+    ) => boolean
   > = {
-    ['OPiece']: (x, y, direction) =>
-      OPieceCollision.checkCollision(this._tetrisBoard, x, y, direction),
+    ['IPiece']: (x, y, direction, piece) =>
+      IPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
+    ['JPiece']: (x, y, direction, piece) =>
+      JPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
+    ['LPiece']: (x, y, direction, piece) =>
+      LPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
+    ['OPiece']: (x, y, direction, piece) =>
+      OPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
   };
 
   constructor(
@@ -44,7 +64,11 @@ export class TetrisCollisionService {
     const x = Math.floor(yCoordinates / this._gridScale);
     const y = Math.floor(xCoordinates / this._gridScale);
 
-    this._tetrisBoard = this.addPieceToBoardLogic[piece.constructor.name](x, y);
+    this._tetrisBoard = this.addPieceToBoardLogic[piece.constructor.name](
+      x,
+      y,
+      piece
+    );
     this.checkForLineClear();
   }
 
@@ -56,11 +80,11 @@ export class TetrisCollisionService {
   ): boolean {
     const x = Math.floor(yCoordinates / this._gridScale);
     const y = Math.floor(xCoordinates / this._gridScale);
-
     return this.checkPieceForCollisionLogic[piece.constructor.name](
       x,
       y,
-      direction
+      direction,
+      piece
     );
   }
 
