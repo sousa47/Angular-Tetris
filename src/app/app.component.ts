@@ -2,6 +2,7 @@ import { Component, EventEmitter, HostListener, Output } from '@angular/core';
 import { TetrisGame } from './interfaces/tetris-game';
 import { TetrisPiece } from './models/pieces/tetris-piece';
 import { TetrisPieceObjectService } from './services/tetris-piece/tetris-piece-object/tetris-piece-object.service';
+import { GameService } from './services/game/game.service';
 
 @Component({
   selector: 'app-root',
@@ -23,11 +24,10 @@ export class AppComponent implements TetrisGame {
   nextPieces: TetrisPiece[];
   currentPiece: TetrisPiece | null;
   holdPiece: TetrisPiece | null;
-  @Output() holdPieceEvent: EventEmitter<TetrisPiece | null> =
-    new EventEmitter();
 
   public constructor(
-    private _tetrisPieceObjectService: TetrisPieceObjectService
+    private _tetrisPieceObjectService: TetrisPieceObjectService,
+    private _gameService: GameService
   ) {
     this.score = 0;
     this.linesCleared = 0;
@@ -45,16 +45,22 @@ export class AppComponent implements TetrisGame {
   clearLines(lines: number): void {
     throw new Error('Method not implemented.');
   }
+
   start(): void {
     const button = document.getElementById('start-button') as HTMLButtonElement;
     button.textContent = 'Pause';
     button.addEventListener('click', this.pause);
+    this._gameService.startGame();
   }
+
   pause(): void {
+    /*
     const button = document.getElementById('start-button') as HTMLButtonElement;
     button.textContent = 'Resume';
     button.addEventListener('click', this.resume);
     document.onkeydown = () => false;
+    this._gameService.pauseGame();
+    */
   }
 
   resume(): void {

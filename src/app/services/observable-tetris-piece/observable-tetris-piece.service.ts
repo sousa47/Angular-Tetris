@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-import { TetrisPiece } from '../models/pieces/tetris-piece';
+import { TetrisPiece } from 'src/app/models/pieces/tetris-piece';
 
 @Injectable({
   providedIn: 'root',
@@ -9,9 +9,12 @@ export class ObservableTetrisPieceService {
   public readonly currentTetrisPieceSubject = new Subject<TetrisPiece | null>();
   private currentTetrisPieceObject: TetrisPiece | null = null;
   private firstOccurenceCurrentTetrisPieceSubject: boolean = true;
+
   public readonly holdenTetrisPieceSubject = new Subject<TetrisPiece | null>();
   private holdenTetrisPieceObject: TetrisPiece | null = null;
   private firstOccurenceHoldenTetrisPieceSubject: boolean = true;
+
+  public readonly startGameSubject = new Subject<boolean>();
 
   public set currentTetrisPiece(piece: TetrisPiece | null) {
     if (this.firstOccurenceCurrentTetrisPieceSubject) {
@@ -26,6 +29,8 @@ export class ObservableTetrisPieceService {
   }
 
   public set holdenTetrisPiece(piece: TetrisPiece | null) {
+
+    console.log(this.currentTetrisPieceObject);
     if (this.firstOccurenceHoldenTetrisPieceSubject) {
       this.firstOccurenceHoldenTetrisPieceSubject = false;
       this.holdenTetrisPieceSubject.next(null);
@@ -36,5 +41,9 @@ export class ObservableTetrisPieceService {
 
   public get holdenTetrisPiece(): TetrisPiece | null {
     return this.holdenTetrisPieceObject;
+  }
+
+  public set startGame(value: boolean) {
+    this.startGameSubject.next(value);
   }
 }
