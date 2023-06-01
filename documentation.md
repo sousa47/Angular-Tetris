@@ -3,8 +3,8 @@
 ## Index
 
 1. [The Context](#the-context)
-2. [How It Was Done]
-3. [Project' Content]
+2. [How It Was Done](#how-it-was-done)
+3. [Implementation Details]
 
 ### The Context
 
@@ -31,4 +31,4 @@ To auxiliate and simplifly the drawing of the pieces, it was used a service and 
 #### Services and Model Class's to Draw the Pieces
 
 The services used to draw were the ones in the folder `src/app/services/tetris-piece` | [Open Folder](src/app/services/tetris-piece/) |, which are:
-- `tetris-piece-drawing.service.ts` | [Open File](src/app/services/tetris-piece/tetris-piece-drawing.service.ts) |, which is the service that draws the pieces. It's relative easy to understand how it works, since it's just a service that draws the pieces using the methods from the models to draw the pieces, so it's manly a service that calls that method or calls the next service.
+- `tetris-piece-drawing.service.ts` | [Open File](src/app/services/tetris-piece/tetris-piece-drawing/tetris-piece-drawing.service.ts) |, which is the service that draws the pieces. It's relative easy to understand how it works, since it's just a service that draws the pieces using the methods from the models to draw the pieces, so it's manly a service that calls that method or calls the next service.
