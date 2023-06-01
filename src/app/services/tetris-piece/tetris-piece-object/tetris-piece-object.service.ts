@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
-import { OPiece } from 'src/app/models/Pieces/concrete-pieces/o-piece';
-import { IPiece } from 'src/app/models/Pieces/concrete-pieces/i-piece';
-import { TPiece } from 'src/app/models/Pieces/concrete-pieces/t-piece';
-import { LPiece } from 'src/app/models/Pieces/concrete-pieces/l-piece';
-import { JPiece } from 'src/app/models/Pieces/concrete-pieces/j-piece';
-import { SPiece } from 'src/app/models/Pieces/concrete-pieces/s-piece';
-import { ZPiece } from 'src/app/models/Pieces/concrete-pieces/z-piece';
-import { TetrisPiece } from 'src/app/models/Pieces/tetris-piece';
+import { TetrisPiece } from 'src/app/models/pieces/tetris-piece';
 import { Canvas } from 'src/app/models/canvas';
+import { IPiece } from 'src/app/models/pieces/concrete-pieces/i-piece';
+import { LPiece } from 'src/app/models/pieces/concrete-pieces/l-piece';
+import { JPiece } from 'src/app/models/pieces/concrete-pieces/j-piece';
+import { OPiece } from 'src/app/models/pieces/concrete-pieces/o-piece';
+import { SPiece } from 'src/app/models/pieces/concrete-pieces/s-piece';
+import { TPiece } from 'src/app/models/pieces/concrete-pieces/t-piece';
+import { ZPiece } from 'src/app/models/pieces/concrete-pieces/z-piece';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TetrisPieceObjectService {
-  private _tetrisPieces: TetrisPiece[] = [];
+  private _tetrisPieces: any[] = [];
   private _canvas?: Canvas;
 
   public set canvas(canvas: Canvas) {
@@ -36,7 +36,7 @@ export class TetrisPieceObjectService {
 
   get randomPiece(): TetrisPiece {
     if (this._tetrisPieces.length === 0) this.generatePieces();
-    return this._tetrisPieces[(this._tetrisPieces.length * Math.random()) | 0];
+    return this._tetrisPieces[(3 | this._tetrisPieces.length * Math.random()) | 0];
   }
 
   public get IPiece(): TetrisPiece {

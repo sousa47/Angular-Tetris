@@ -1,6 +1,7 @@
 import { Canvas } from '../../canvas';
 import { TetrisPiece } from '../tetris-piece';
 
+
 export class OPiece extends TetrisPiece {
   public constructor(
     xCoordinates: number,

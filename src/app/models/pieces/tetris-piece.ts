@@ -21,7 +21,7 @@ export abstract class TetrisPiece implements TetrisInput {
     protected _xCoordinates: number = 0,
     protected _yCoordinates: number = 0,
     protected _pieceColor: string = 'black',
-    protected readonly _canvas: Canvas
+    protected _canvas: Canvas
   ) {
     this._context = this._canvas.context || null;
     this._canvas = _canvas;
@@ -35,20 +35,6 @@ export abstract class TetrisPiece implements TetrisInput {
     heightLength: number,
     widthLength: number
   ): CanvasRenderingContext2D;
-
-  public movePieceDown(
-    context: CanvasRenderingContext2D,
-    hardDrop: boolean = false
-  ): CanvasRenderingContext2D {
-    // TODO: Check if the piece can move down (if there is a piece below it)
-    return this.movePiece(
-      context,
-      this._xCoordinates,
-      hardDrop
-        ? this._canvas!.canvas.height - this._pieceHeight
-        : this._yCoordinates + this.movement
-    );
-  }
 
   protected drawPieceAndOuterBorder(
     context: CanvasRenderingContext2D,
@@ -95,38 +81,66 @@ export abstract class TetrisPiece implements TetrisInput {
     return context;
   }
 
+  public movePieceDown(
+    context: CanvasRenderingContext2D,
+    hardDrop: boolean = false,
+    drawPiece: boolean = true
+  ): CanvasRenderingContext2D {
+    return this.movePiece(
+      context,
+      this._xCoordinates,
+      hardDrop
+        ? this._canvas!.canvas.height - this._pieceHeight
+        : this._yCoordinates + this.movement,
+      true,
+      drawPiece
+    );
+  }
+
   public movePieceLeft(
-    context: CanvasRenderingContext2D
+    context: CanvasRenderingContext2D,
+    drawPiece: boolean = true
   ): CanvasRenderingContext2D {
     return this.movePiece(
       context,
       this._xCoordinates - this.movement,
-      this._yCoordinates
+      this._yCoordinates,
+      true,
+      drawPiece
     );
   }
 
   public movePieceRight(
-    context: CanvasRenderingContext2D
+    context: CanvasRenderingContext2D,
+    drawPiece: boolean = true
   ): CanvasRenderingContext2D {
     return this.movePiece(
       context,
       this._xCoordinates + this.movement,
-      this._yCoordinates
+      this._yCoordinates,
+      true,
+      drawPiece
     );
   }
 
   public movePiece(
     context: CanvasRenderingContext2D,
     xCoordinates: number,
-    yCoordinates: number
+    yCoordinates: number,
+    clearPreviousPosition: boolean = true,
+    drawPiece: boolean = true
   ): CanvasRenderingContext2D {
     if (!this.canMoveToCoordinates(xCoordinates, yCoordinates))
       return this._context!;
 
-    context = this.clearPiecePreviousPosition(context);
+    if (clearPreviousPosition)
+      context = this.clearPiecePreviousPosition(context);
     this.xCoordinates = xCoordinates;
     this.yCoordinates = yCoordinates;
-    return this.drawPiece(context, this._pieceHeight, this._pieceWidth);
+
+    return drawPiece
+      ? this.drawPiece(context, this._pieceHeight, this._pieceWidth)
+      : this._context!;
   }
 
   public canMoveToCoordinates(
@@ -142,7 +156,8 @@ export abstract class TetrisPiece implements TetrisInput {
   }
 
   public rotatePieceClockwise(
-    context: CanvasRenderingContext2D
+    context: CanvasRenderingContext2D,
+    drawPiece: boolean = true
   ): CanvasRenderingContext2D {
     return this.rotatePiece(context);
   }
@@ -209,5 +224,9 @@ export abstract class TetrisPiece implements TetrisInput {
 
   public set pieceWidth(pieceWidth: number) {
     this._pieceWidth = pieceWidth;
+  }
+
+  public set canvas(canvas: Canvas) {
+    this._canvas = canvas;
   }
 }

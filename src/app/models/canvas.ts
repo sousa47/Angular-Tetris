@@ -12,7 +12,6 @@ export class Canvas {
       this._context = this._canvas.getContext('2d');
       this._context!.fillStyle = 'black';
       this._context!.lineWidth = 2;
-      this._context!.strokeStyle = 'black';
       this._canvas.parentElement!.appendChild(this.drawCanvasGrid());
     } else {
       throw new Error('Invalid canvas context. Cannot be null.');
@@ -53,7 +52,7 @@ export class Canvas {
   }
 
   private drawCanvasGrid(): Node {
-    const step = this.width / 10;
+    const step = this.gridUnit;
 
     var canvasGridElement = document.createElement('canvas');
     canvasGridElement.width = this.width;
@@ -65,7 +64,7 @@ export class Canvas {
       canvasGrid.moveTo(x, 0);
       canvasGrid.lineTo(x, this.height);
     }
-    canvasGrid.strokeStyle = 'rgba(20,20,20, 0.2)';
+    canvasGrid.strokeStyle = 'rgba(300,300,300, 0.15)';
     canvasGrid.lineWidth = 2;
     canvasGrid.stroke();
 
@@ -74,7 +73,7 @@ export class Canvas {
       canvasGrid.moveTo(0, y);
       canvasGrid.lineTo(this.width, y);
     }
-    canvasGrid.strokeStyle = 'rgba(20,20,20, 0.2)';
+    canvasGrid.strokeStyle = 'rgba(300,300,300, 0.15)';
     canvasGrid.lineWidth = 2;
     canvasGrid.stroke();
 

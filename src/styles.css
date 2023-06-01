@@ -1,1 +1,7 @@
-/* You can add global styles to this file, and also import other style files */
+body{
+  background-color: #276f90;
+}
+
+canvas{
+  background-color: rgba(115, 115, 115, 0.15);
+}

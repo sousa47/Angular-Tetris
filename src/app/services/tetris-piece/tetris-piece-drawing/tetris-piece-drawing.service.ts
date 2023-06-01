@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { TetrisPiece } from 'src/app/models/Pieces/tetris-piece';
+import { TetrisPiece } from 'src/app/models/pieces/tetris-piece';
 import { TetrisPieceObjectService } from '../tetris-piece-object/tetris-piece-object.service';
 
 @Injectable({
@@ -7,14 +7,6 @@ import { TetrisPieceObjectService } from '../tetris-piece-object/tetris-piece-ob
 })
 export class TetrisPieceDrawingService {
   constructor(public tetrisPieceObjectService: TetrisPieceObjectService) {}
-
-  public randomPieceAndPieceDrawing(
-    context: CanvasRenderingContext2D
-  ): [TetrisPiece, CanvasRenderingContext2D] {
-    const randomPiece = this.tetrisPieceObjectService.randomPiece;
-    randomPiece.clearCanvas();
-    return [randomPiece, this.getPieceDrawing(context, randomPiece)];
-  }
 
   public getPieceDrawing(
     context: CanvasRenderingContext2D,
@@ -44,7 +36,6 @@ export class TetrisPieceDrawingService {
     context: CanvasRenderingContext2D
   ): CanvasRenderingContext2D {
     const numberOfSections = 4;
-
     return this.tetrisPieceObjectService.IPiece.drawPiece(
       context,
       this.tetrisPieceObjectService.getCanvas.gridUnit * numberOfSections,

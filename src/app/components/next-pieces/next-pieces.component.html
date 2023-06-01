@@ -1,3 +1,9 @@
-<div class="canvas-section">
-  <canvas #canvas width="300px" height="600px"></canvas>
-</div>
+<div class="images-section">
+  <ul>
+    <li *ngFor="let piece of nextPiecesImageSourceArray">
+      <img [src]="piece" alt="next piece" class="next-piece-image"/>
+    </li>
+  </ul>
+<div>
+
+
