@@ -88,7 +88,8 @@ export class SPiece extends TetrisPiece {
 
     this.checkRotationNewXCoordinates(newXCoordinates);
 
-    if (newYCoordinates < this._canvas!.gridUnit * -2 ) newYCoordinates = this._canvas!.gridUnit * -2 ;
+    if (newYCoordinates < this._canvas!.gridUnit * -2)
+      newYCoordinates = this._canvas!.gridUnit * -2;
     if (newYCoordinates > canvasHeight - this._pieceHeight)
       newYCoordinates = canvasHeight - this._pieceHeight;
 
@@ -141,14 +142,14 @@ export class SPiece extends TetrisPiece {
       this.xCoordinates,
       this.yCoordinates,
       twoThirdsWidth,
-      this._pieceHeight
+      halfHeight
     );
     context = this.clearPieceAndBorder(
       context,
       this.xCoordinates - thirdWidth,
       this.yCoordinates + halfHeight,
       twoThirdsWidth,
-      this._pieceHeight
+      halfHeight
     );
 
     return context;
@@ -199,7 +200,7 @@ export class SPiece extends TetrisPiece {
       context,
       this.xCoordinates,
       this.yCoordinates,
-      this._pieceWidth,
+      halfWidth,
       twoThirdsHeight
     );
 
@@ -207,7 +208,7 @@ export class SPiece extends TetrisPiece {
       context,
       this.xCoordinates + halfWidth,
       this.yCoordinates + thirdHeight,
-      this._pieceWidth,
+      halfWidth,
       twoThirdsHeight
     );
 
@@ -240,7 +241,7 @@ export class SPiece extends TetrisPiece {
     return (
       xCoordinates - thirdWidth >= 0 &&
       xCoordinates - thirdWidth <= this._canvas.width - this._pieceWidth &&
-      yCoordinates >= this._canvas!.gridUnit * -2  &&
+      yCoordinates >= this._canvas!.gridUnit * -2 &&
       yCoordinates <= this._canvas.height - this._pieceHeight
     );
   }
@@ -253,7 +254,7 @@ export class SPiece extends TetrisPiece {
     return (
       xCoordinates >= 0 &&
       xCoordinates - thirdWidth <= this._canvas.width - this._pieceWidth &&
-      yCoordinates >= this._canvas!.gridUnit * -2  &&
+      yCoordinates >= this._canvas!.gridUnit * -2 &&
       yCoordinates <= this._canvas.height - this._pieceHeight
     );
   }

@@ -35,7 +35,7 @@ export class NextPiecesService {
 
   private randomPiece(): string {
     // To changes odds of certain pieces, change the number in the Math.random() * 7
-    const randomNumber: number = 2 // Math.floor(Math.random() * 7);
+    const randomNumber: number = Math.floor(Math.random() * 7);
     switch (randomNumber) {
       case 0:
         return 'IPiece';

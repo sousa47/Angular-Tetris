@@ -59,7 +59,7 @@ export class TetrisCollisionService {
     );
   }
 
-  private setTetrisBoard(): void {
+  public setTetrisBoard(): void {
     this._tetrisBoard = Array.from(Array(20).fill(0), () =>
       new Array(10).fill(0)
     );

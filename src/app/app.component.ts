@@ -17,12 +17,11 @@ export class AppComponent {
   tutorialG = 'Random Piece';
 
   score: number = 0;
+  gameOverText: string = 'Game Over';
 
   public constructor(private _gameService: GameService) {}
 
   start(): void {
-    const button = document.getElementById('start-button') as HTMLButtonElement;
-    button.disabled = true;
     this._gameService.startGame();
   }
 }

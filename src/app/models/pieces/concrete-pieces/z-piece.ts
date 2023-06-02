@@ -144,14 +144,14 @@ export class ZPiece extends TetrisPiece {
       this.xCoordinates,
       this.yCoordinates,
       twoThirdsWidth,
-      this._pieceHeight
+      halfHeight
     );
     context = this.clearPieceAndBorder(
       context,
       this.xCoordinates + thirdWidth,
       this.yCoordinates + halfHeight,
       twoThirdsWidth,
-      this._pieceHeight
+      halfHeight
     );
 
     return context;
@@ -194,6 +194,7 @@ export class ZPiece extends TetrisPiece {
   private clearZPieceAt90Or270DegreeRotation(
     context: CanvasRenderingContext2D
   ): CanvasRenderingContext2D {
+    const halfWidth = this._pieceWidth / 2;
     const thirdHeight = this._pieceHeight / 3;
     const twoThirdsHeight = this._pieceHeight * (2 / 3);
 
@@ -201,15 +202,15 @@ export class ZPiece extends TetrisPiece {
       context,
       this.xCoordinates,
       this.yCoordinates,
-      this._pieceWidth,
+      halfWidth,
       twoThirdsHeight
     );
 
     context = this.clearPieceAndBorder(
       context,
-      this.xCoordinates - this._pieceWidth / 2,
+      this.xCoordinates - halfWidth,
       this.yCoordinates + thirdHeight,
-      this._pieceWidth,
+      halfWidth,
       twoThirdsHeight
     );
 
@@ -240,7 +241,7 @@ export class ZPiece extends TetrisPiece {
     return (
       xCoordinates >= 0 &&
       xCoordinates <= this._canvas.width - this._pieceWidth &&
-      yCoordinates >= this._canvas!.gridUnit * -2  &&
+      yCoordinates >= this._canvas!.gridUnit * -2 &&
       yCoordinates <= this._canvas.height - this._pieceHeight
     );
   }
@@ -254,7 +255,7 @@ export class ZPiece extends TetrisPiece {
     return (
       xCoordinates >= halfWidth &&
       xCoordinates - halfWidth <= this._canvas.width - this._pieceWidth &&
-      yCoordinates >= this._canvas!.gridUnit * -2  &&
+      yCoordinates >= this._canvas!.gridUnit * -2 &&
       yCoordinates <= this._canvas.height - this._pieceHeight
     );
   }

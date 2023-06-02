@@ -11,12 +11,12 @@ import { ObservableTetrisPieceService } from 'src/app/services/observable-tetris
 })
 export class HoldPieceComponent implements AfterViewInit {
   @ViewChild('holdPieceCanvas', { static: true })
-  canvas!: ElementRef<HTMLCanvasElement>;
+  canvasElement!: ElementRef<HTMLCanvasElement>;
 
-  private _canvas: CanvasRenderingContext2D | null = null;
+  private _canvasContext: CanvasRenderingContext2D | null = null;
   private _currentHoldPiece: TetrisPiece | null = null;
 
-  constructor(
+ public constructor(
     private _tetrisPieceDrawingService: TetrisPieceDrawingService,
     private _observableTetrisPieceService: ObservableTetrisPieceService
   ) {
@@ -28,12 +28,12 @@ export class HoldPieceComponent implements AfterViewInit {
     );
   }
 
-  ngAfterViewInit(): void {
-    this._canvas = this.canvas.nativeElement.getContext('2d');
+  public ngAfterViewInit(): void {
+    this._canvasContext = this.canvasElement.nativeElement.getContext('2d');
 
-    const canvasHalfHeight = this._canvas!.canvas.height / 2;
+    const canvasHalfHeight = this._canvasContext!.canvas.height / 2;
     const canvas = new Canvas(
-      this.canvas.nativeElement,
+      this.canvasElement.nativeElement,
       20,
       undefined,
       canvasHalfHeight
@@ -47,8 +47,8 @@ export class HoldPieceComponent implements AfterViewInit {
 
     this.postionPiece();
 
-    this._canvas = this._tetrisPieceDrawingService.getPieceDrawing(
-      this._canvas!,
+    this._canvasContext = this._tetrisPieceDrawingService.getPieceDrawing(
+      this._canvasContext!,
       this._currentHoldPiece!
     );
 
@@ -57,21 +57,21 @@ export class HoldPieceComponent implements AfterViewInit {
   }
 
   private postionPiece(): void {
-    this._canvas!.clearRect(0, 0, 2000, 2000);
-    this._currentHoldPiece!.movePiece(this._canvas!, 0, 0);
+    this._canvasContext!.clearRect(0, 0, 2000, 2000);
+    this._currentHoldPiece!.movePiece(this._canvasContext!, 0, 0);
 
     const setPieceCenterFunction =
       this._currentHoldPiece!.constructor.name === 'TPiece' ||
       this._currentHoldPiece!.constructor.name === 'SPiece'
         ? () => {
-            this._currentHoldPiece!.movePieceLeft(this._canvas!);
+            this._currentHoldPiece!.movePieceLeft(this._canvasContext!);
           }
         : () => {
-            this._currentHoldPiece!.movePieceRight(this._canvas!);
+            this._currentHoldPiece!.movePieceRight(this._canvasContext!);
           };
 
     for (let i = 0; i < 2; i++) setPieceCenterFunction();
-    this._currentHoldPiece!.movePieceDown(this._canvas!);
-    this._currentHoldPiece!.movePieceDown(this._canvas!);
+    this._currentHoldPiece!.movePieceDown(this._canvasContext!);
+    this._currentHoldPiece!.movePieceDown(this._canvasContext!);
   }
 }

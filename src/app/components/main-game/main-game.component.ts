@@ -35,8 +35,6 @@ export class MainGameComponent implements AfterViewInit {
   private _canvas: Canvas | undefined;
   private _canvasGridUnit: number = 40;
 
-  private _gameLoop: boolean = true;
-  private _gameSpeed = 2000;
   private _gameLoopInterval: any = undefined;
   private _previousPieceXPosition: number = 0;
   private _previousPieceYPosition: number = 0;
@@ -76,12 +74,10 @@ export class MainGameComponent implements AfterViewInit {
 
     this._observableTetrisPieceService.startGameSubject.subscribe(
       (value: boolean) => {
-        if (value && this._gameLoop) {
-          this._gameSpeed = 2000;
+        if (value) {
           this.startGameLoop();
-        } else {
-          this._gameSpeed = 0;
-          this._gameLoop = false;
+          this._currentPiece?.clearCanvas();
+          this._tetrisCollisionService.setTetrisBoard();
         }
       }
     );
@@ -107,10 +103,16 @@ export class MainGameComponent implements AfterViewInit {
   }
 
   public movePieceDownhardDrop(): void {
+    const currentYPosition = this._currentPiece!.yCoordinates;
     while (!this.checkCollision('down')) {
       this._currentPiece!.movePieceDown(this._canvasContext!) || null;
     }
-    this.nextPiece();
+
+    if (this._currentPiece!.yCoordinates == currentYPosition) {
+      this.endGameLoop();
+    } else {
+      this.nextPiece();
+    }
   }
 
   public rotatePiece(): void {
@@ -126,10 +128,11 @@ export class MainGameComponent implements AfterViewInit {
     this._canHoldPiece = false;
 
     if (holdenPiece) {
+      this._currentPiece.clearPiecePreviousPosition(this._canvasContext!);
       this._currentPiece = holdenPiece;
       this.drawPiece();
     } else {
-      this.nextPiece();
+      this.nextPiece(false);
     }
   }
 
@@ -151,17 +154,30 @@ export class MainGameComponent implements AfterViewInit {
     if (this._gameLoopInterval !== undefined) return;
 
     this._gameLoopInterval = setInterval(() => {
-      if (this._currentPiece && this._gameSpeed != 0) this.movePieceDown();
-      if (!this.checkIfPieceMoved()) this.nextPiece();
-    }, this._gameSpeed);
+      if (this._currentPiece) this.movePieceDown();
+
+      if (!this.checkIfPieceMoved()) {
+        if (this._currentPiece?.yCoordinates == 0) this.endGameLoop();
+        this.nextPiece();
+      }
+    }, this._gameService.gameSpeed);
   }
 
-  private nextPiece(): void {
-    this._tetrisCollisionService.addPieceToBoard(
-      this._currentPiece?.xCoordinates!,
-      this._currentPiece?.yCoordinates!,
-      this._currentPiece!
-    );
+  private endGameLoop(): void {
+    clearInterval(this._gameLoopInterval);
+    this._gameLoopInterval = undefined;
+    this._gameService.endGame();
+  }
+
+  private nextPiece(addCurrentPiece: boolean = true): void {
+    if (addCurrentPiece) {
+      this._tetrisCollisionService.addPieceToBoard(
+        this._currentPiece?.xCoordinates!,
+        this._currentPiece?.yCoordinates!,
+        this._currentPiece!
+      );
+    }
+    this._canHoldPiece = true;
     this._observableTetrisPieceService.currentTetrisPiece = null;
   }
 
@@ -211,6 +227,7 @@ export class MainGameComponent implements AfterViewInit {
 
   @HostListener('document:keyup', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
+    if (this._gameService.gameIsOver) return;
     const inputLogicFuntion = this.inputLogic[event.key];
     if (inputLogicFuntion) inputLogicFuntion();
   }

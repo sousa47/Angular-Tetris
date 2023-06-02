@@ -1,31 +1,6 @@
 import { TetrisPiece } from 'src/app/models/pieces/tetris-piece';
 
 export class ZPieceCollision {
-  private static pieceToBoardLogic: Record<
-    number,
-    (currentBoard: number[][], x: number, y: number) => number[][]
-  > = {
-    0: this.addPieceAt0Or180Degrees,
-    180: this.addPieceAt0Or180Degrees,
-    90: this.addPieceAt90Or270Degrees,
-    270: this.addPieceAt90Or270Degrees,
-  };
-
-  private static checkCollisionLogic: Record<
-    number,
-    (
-      currentBoard: number[][],
-      x: number,
-      y: number,
-      direction: 'down' | 'left' | 'right'
-    ) => boolean
-  > = {
-    0: this.checkCollisionAt0Or180Degrees,
-    180: this.checkCollisionAt0Or180Degrees,
-    90: this.checkCollisionAt90Or270Degrees,
-    270: this.checkCollisionAt90Or270Degrees,
-  };
-
   public static addPieceToBoard(
     currentBoard: number[][],
     x: number,
@@ -135,4 +110,29 @@ export class ZPieceCollision {
       return true;
     }
   }
+
+  private static pieceToBoardLogic: Record<
+    number,
+    (currentBoard: number[][], x: number, y: number) => number[][]
+  > = {
+    0: this.addPieceAt0Or180Degrees,
+    180: this.addPieceAt0Or180Degrees,
+    90: this.addPieceAt90Or270Degrees,
+    270: this.addPieceAt90Or270Degrees,
+  };
+
+  private static checkCollisionLogic: Record<
+    number,
+    (
+      currentBoard: number[][],
+      x: number,
+      y: number,
+      direction: 'down' | 'left' | 'right'
+    ) => boolean
+  > = {
+    0: this.checkCollisionAt0Or180Degrees,
+    180: this.checkCollisionAt0Or180Degrees,
+    90: this.checkCollisionAt90Or270Degrees,
+    270: this.checkCollisionAt90Or270Degrees,
+  };
 }

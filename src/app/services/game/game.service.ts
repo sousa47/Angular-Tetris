@@ -5,6 +5,9 @@ import { TetrisPieceObjectService } from '../tetris-piece/tetris-piece-object/te
   providedIn: 'root',
 })
 export class GameService {
+  public gameSpeed: number = 2000;
+  public gameIsOver: boolean = false;
+  public gameIsLooping: boolean = false;
 
   public constructor(
     private _tetrisPieceObjectService: TetrisPieceObjectService,
@@ -12,9 +15,23 @@ export class GameService {
   ) {}
 
   public startGame(): void {
+    const gameButton = document.getElementById('start-button')!;
+    const gameOverText = document.getElementById('game-over-text')!;
+    gameButton.style.display = 'none';
+    gameOverText.style.display = 'none';
+    this.gameIsOver = false;
     this._observableTetrisPiece.startGame = true;
     const startingPiece = this._tetrisPieceObjectService.randomPiece;
     this._observableTetrisPiece.currentTetrisPiece = startingPiece;
+  }
+
+  public endGame(): void {
+    const gameButton = document.getElementById('start-button')!;
+    const gameOverText = document.getElementById('game-over-text')!;
+    gameButton.style.display = 'block';
+    gameOverText.style.display = 'block';
+    this.gameIsOver = true;
+    this._observableTetrisPiece.startGame = false;
   }
 
   public addScore(score: number): void {
