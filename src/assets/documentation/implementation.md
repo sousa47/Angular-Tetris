@@ -468,7 +468,31 @@ First of all, let's see how each piece looks like and their names:
 
 The pieces are all very similar, they all have the same methods, but they have different implementations of the methods. We'll go through an overall of how the pieces are implemented, and then we'll go through some of them in more detail. We will not cover the `OPiece` since it is the simplest piece, instead we will go through the `IPiece` and the `TPiece`.
 
+First lets take a look at the `Canvas`:
 
+![Canvas](../../assets/documentation/documentation-images/canvas.png)
+
+
+As we can see in the image, the y coordinate is inverted, so the y coordinate increases as we go down, and decreases as we go up. This is important to keep in mind when we are drawing the pieces, since we need to take this into account. The `x` and `y` coordinates are the coordinates of the top left corner of the piece, and the `width` and `height` are the dimensions of the piece. The `gridUnit` is calculated by dividing the canvas width by the number of columns, and the canvas height by the number of rows. The `gridUnit` is used to calculate the dimensions of the pieces, and to calculate the coordinates of the pieces.
+
+So before we starting to draw we need to decide the origin point for the piece, and to do that we find the closest point of the piece to origin, and use the correspondent square as the origin point of the piece. Let's take a look at the possible origins point of the `IPiece`:
+
+![IPiece](../../assets/documentation/documentation-images/IPieceHorizontalOO.png)
+
+![IPiece](../../assets/documentation/documentation-images/IPieceVerticalOO.png)
+
+As we can see in the images the *star* represents the origin point of the piece, to do this easily we try to go to the highest point of the piece (highest as in going up, even though we are going negative in the y coordinates), and then go to left. With this in mind, let's take a look at the `TPiece` that is more complex.
+
+![TPiece](../../assets/documentation/documentation-images/TPiece0OO.png)
+
+![TPiece](../../assets/documentation/documentation-images/TPiece1OO.png)
+
+![TPiece](../../assets/documentation/documentation-images/TPiece2OO.png)
+
+![TPiece](../../assets/documentation/documentation-images/TPiece3OO.png)
+
+
+As we can see in the images, the origin point changes a lot depending of the rotation of the piece. Now that we have the origin point of the piece, we can start drawing the piece.
 
 ### Services
 #### Game Service
