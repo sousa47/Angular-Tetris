@@ -52,7 +52,12 @@ export class MainGameComponent implements AfterViewInit {
 
   public ngAfterViewInit(): void {
     this._canvasContext = this.canvas.nativeElement.getContext('2d');
-    this._canvas = new Canvas(this.canvas.nativeElement);
+    this._canvas = new Canvas(
+      this.canvas.nativeElement,
+      undefined,
+      undefined,
+      -40
+    );
     this._tetrisPieceDrawingService.tetrisPieceObjectService.canvas =
       this._canvas;
 

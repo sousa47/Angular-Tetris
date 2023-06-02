@@ -7,7 +7,8 @@ export class IPieceCollision {
     y: number,
     piece: TetrisPiece
   ): number[][] {
-    return piece.currentRotationDegree % 180 === 0
+    return piece.currentRotationDegree === 90 ||
+      piece.currentRotationDegree === 270
       ? this.addPieceHorizontal(currentBoard, x, y)
       : this.addPieceVertical(currentBoard, x, y);
   }
@@ -19,7 +20,8 @@ export class IPieceCollision {
     direction: 'down' | 'left' | 'right',
     piece: TetrisPiece
   ): boolean {
-    return piece.currentRotationDegree % 180 === 0
+    return piece.currentRotationDegree === 90 ||
+      piece.currentRotationDegree === 270
       ? this.checkCollisionHorizontal(currentBoard, x, y, direction)
       : this.checkCollisionVertical(currentBoard, x, y, direction);
   }

@@ -117,7 +117,7 @@ export class TPieceCollision {
         case 'down':
           return (
             currentBoard[x + 2][y] === 1 ||
-            currentBoard[x + 2][y - 1] === 1 ||
+            currentBoard[x + 2][y + 1] === 1 ||
             currentBoard[x + 1][y - 2] === 1
           );
         case 'left':

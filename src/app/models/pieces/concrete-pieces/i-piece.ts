@@ -23,7 +23,7 @@ export class IPiece extends TetrisPiece {
     context.fillStyle = this._pieceColor;
 
     context =
-      this._rotationDegree % 180 === 0
+      this._rotationDegree === 90 || this._rotationDegree === 270
         ? this.drawPieceHorizontal(context)
         : this.drawPieceVertical(context);
 
@@ -36,7 +36,6 @@ export class IPiece extends TetrisPiece {
     context: CanvasRenderingContext2D
   ): CanvasRenderingContext2D {
     const sectionLength = this._pieceWidth / this._numberOfSections;
-
     for (let i = 0; i < this._numberOfSections; i++) {
       context = this.drawPieceAndOuterBorder(
         context,
@@ -54,7 +53,6 @@ export class IPiece extends TetrisPiece {
     context: CanvasRenderingContext2D
   ): CanvasRenderingContext2D {
     const sectionLength = this._pieceHeight / this._numberOfSections;
-
     for (let i = 0; i < this._numberOfSections; i++) {
       context = this.drawPieceAndOuterBorder(
         context,
@@ -72,29 +70,31 @@ export class IPiece extends TetrisPiece {
     context: CanvasRenderingContext2D
   ): CanvasRenderingContext2D {
     const sectionLength =
-      this._rotationDegree % 180 === 0 ? this._pieceWidth : this._pieceHeight;
+      this._rotationDegree === 90 || this._rotationDegree === 270
+        ? this._pieceWidth
+        : this._pieceHeight;
 
     // Inner border. (The drawing is all done inside the for loop.)
     for (let i = 1; i < this._numberOfSections; i++) {
       const sectionLineCoordinates =
-        this._rotationDegree % 180 === 0
+        this._rotationDegree === 90 || this._rotationDegree === 270
           ? this.xCoordinates + (sectionLength / this._numberOfSections) * i
           : this.yCoordinates + (sectionLength / this._numberOfSections) * i;
 
       context.beginPath();
       context.moveTo(
-        this._rotationDegree % 180 === 0
+        this._rotationDegree === 90 || this._rotationDegree === 270
           ? sectionLineCoordinates
           : this.xCoordinates,
-        this._rotationDegree % 180 === 0
+        this._rotationDegree === 90 || this._rotationDegree === 270
           ? this.yCoordinates
           : sectionLineCoordinates
       );
       context.lineTo(
-        this._rotationDegree % 180 === 0
+        this._rotationDegree === 90 || this._rotationDegree === 270
           ? sectionLineCoordinates
           : this.xCoordinates + this._pieceWidth,
-        this._rotationDegree % 180 === 0
+        this._rotationDegree === 90 || this._rotationDegree === 270
           ? this.yCoordinates + this._pieceHeight
           : sectionLineCoordinates
       );
@@ -131,23 +131,23 @@ export class IPiece extends TetrisPiece {
 
     switch (this._rotationDegree) {
       case 0:
-        newXCoordinates += quarterWidth;
-        newYCoordinates -= halfWidth;
+        newXCoordinates -= halfHeight;
+        newYCoordinates += halfHeight;
         this._rotationDegree = 90;
         break;
       case 90:
-        newXCoordinates -= quarterHeight;
-        newYCoordinates += quarterHeight;
+        newXCoordinates += quarterWidth;
+        newYCoordinates -= halfWidth;
         this._rotationDegree = 180;
         break;
       case 180:
-        newXCoordinates += halfWidth;
-        newYCoordinates -= quarterWidth;
+        newXCoordinates -= quarterHeight;
+        newYCoordinates += quarterHeight;
         this._rotationDegree = 270;
         break;
       case 270:
-        newXCoordinates -= halfHeight;
-        newYCoordinates += halfHeight;
+        newXCoordinates += halfWidth;
+        newYCoordinates -= quarterWidth;
         this._rotationDegree = 0;
         break;
     }

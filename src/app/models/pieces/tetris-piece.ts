@@ -151,7 +151,7 @@ export abstract class TetrisPiece implements TetrisInput {
     return (
       xCoordinates >= 0 &&
       xCoordinates <= this._canvas!.canvas.width - this._pieceWidth &&
-      yCoordinates >= 0 &&
+      yCoordinates >= this._canvas!.gridUnit * -2 &&
       yCoordinates <= this._canvas!.canvas.height - this._pieceHeight
     );
   }
@@ -178,7 +178,8 @@ export abstract class TetrisPiece implements TetrisInput {
     if (newXCoordinates > canvasWidth - this._pieceHeight)
       newXCoordinates = canvasWidth - this._pieceHeight;
 
-    if (newYCoordinates < 0) newYCoordinates = 0;
+    if (newYCoordinates < this._canvas!.gridUnit * -2)
+      newYCoordinates = this._canvas!.gridUnit * -2;
     if (newYCoordinates > canvasHeight - this._pieceWidth)
       newYCoordinates = canvasHeight - this._pieceWidth;
 
@@ -233,5 +234,9 @@ export abstract class TetrisPiece implements TetrisInput {
 
   public get currentRotationDegree(): RotationDegree {
     return this._rotationDegree;
+  }
+
+  public set currentRotationDegree(rotationDegree: RotationDegree) {
+    this._rotationDegree = rotationDegree;
   }
 }

@@ -3,11 +3,11 @@ import { ObservableTetrisPieceService } from '../observable-tetris-piece/observa
 import { TetrisPiece } from 'src/app/models/pieces/tetris-piece';
 import { OPieceCollision } from './pieces-collisions/o-piece-collision';
 import { IPieceCollision } from './pieces-collisions/i-piece-collision';
-import { LPieceCollision } from './pieces-collisions/l-piece-collision';
 import { JPieceCollision } from './pieces-collisions/j-piece-collision';
 import { SPieceCollision } from './pieces-collisions/s-piece-collision';
 import { TPieceCollision } from './pieces-collisions/t-piece-collision';
 import { ZPieceCollision } from './pieces-collisions/z-piece-collision';
+import { LPieceCollision } from './pieces-collisions/l-piece-collision';
 
 @Injectable({
   providedIn: 'root',
@@ -15,51 +15,6 @@ import { ZPieceCollision } from './pieces-collisions/z-piece-collision';
 export class TetrisCollisionService {
   private _tetrisBoard: number[][] = [];
   private _gridScale: number = 40;
-
-  private addPieceToBoardLogic: Record<
-    string,
-    (x: number, y: number, piece: TetrisPiece) => number[][]
-  > = {
-    ['IPiece']: (x, y, piece) =>
-      IPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
-    ['JPiece']: (x, y, piece) =>
-      JPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
-    ['LPiece']: (x, y, piece) =>
-      LPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
-    ['OPiece']: (x, y, piece) =>
-      OPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
-    ['SPiece']: (x, y, piece) =>
-      SPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
-    ['TPiece']: (x, y, piece) =>
-      TPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
-    ['ZPiece']: (x, y, piece) =>
-      ZPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
-  };
-
-  private checkPieceForCollisionLogic: Record<
-    string,
-    (
-      x: number,
-      y: number,
-      direction: 'down' | 'left' | 'right',
-      piece: TetrisPiece
-    ) => boolean
-  > = {
-    ['IPiece']: (x, y, direction, piece) =>
-      IPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
-    ['JPiece']: (x, y, direction, piece) =>
-      JPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
-    ['LPiece']: (x, y, direction, piece) =>
-      LPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
-    ['OPiece']: (x, y, direction, piece) =>
-      OPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
-    ['SPiece']: (x, y, direction, piece) =>
-      SPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
-    ['TPiece']: (x, y, direction, piece) =>
-      TPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
-    ['ZPiece']: (x, y, direction, piece) =>
-      ZPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
-  };
 
   constructor(
     private _observableTetrisPieceService: ObservableTetrisPieceService
@@ -85,6 +40,7 @@ export class TetrisCollisionService {
       piece
     );
     this.checkForLineClear();
+    console.log(this._tetrisBoard);
   }
 
   public checkCollision(
@@ -130,4 +86,49 @@ export class TetrisCollisionService {
 
     this._observableTetrisPieceService.linesCleared = lines;
   }
+
+  private addPieceToBoardLogic: Record<
+    string,
+    (x: number, y: number, piece: TetrisPiece) => number[][]
+  > = {
+    ['IPiece']: (x, y, piece) =>
+      IPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
+    ['JPiece']: (x, y, piece) =>
+      JPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
+    ['LPiece']: (x, y, piece) =>
+      LPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
+    ['OPiece']: (x, y, piece) =>
+      OPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
+    ['SPiece']: (x, y, piece) =>
+      SPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
+    ['TPiece']: (x, y, piece) =>
+      TPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
+    ['ZPiece']: (x, y, piece) =>
+      ZPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
+  };
+
+  private checkPieceForCollisionLogic: Record<
+    string,
+    (
+      x: number,
+      y: number,
+      direction: 'down' | 'left' | 'right',
+      piece: TetrisPiece
+    ) => boolean
+  > = {
+    ['IPiece']: (x, y, direction, piece) =>
+      IPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
+    ['JPiece']: (x, y, direction, piece) =>
+      JPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
+    ['LPiece']: (x, y, direction, piece) =>
+      LPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
+    ['OPiece']: (x, y, direction, piece) =>
+      OPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
+    ['SPiece']: (x, y, direction, piece) =>
+      SPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
+    ['TPiece']: (x, y, direction, piece) =>
+      TPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
+    ['ZPiece']: (x, y, direction, piece) =>
+      ZPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
+  };
 }

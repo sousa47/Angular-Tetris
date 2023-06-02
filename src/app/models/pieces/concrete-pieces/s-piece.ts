@@ -88,7 +88,7 @@ export class SPiece extends TetrisPiece {
 
     this.checkRotationNewXCoordinates(newXCoordinates);
 
-    if (newYCoordinates < 0) newYCoordinates = 0;
+    if (newYCoordinates < this._canvas!.gridUnit * -2 ) newYCoordinates = this._canvas!.gridUnit * -2 ;
     if (newYCoordinates > canvasHeight - this._pieceHeight)
       newYCoordinates = canvasHeight - this._pieceHeight;
 
@@ -240,7 +240,7 @@ export class SPiece extends TetrisPiece {
     return (
       xCoordinates - thirdWidth >= 0 &&
       xCoordinates - thirdWidth <= this._canvas.width - this._pieceWidth &&
-      yCoordinates >= 0 &&
+      yCoordinates >= this._canvas!.gridUnit * -2  &&
       yCoordinates <= this._canvas.height - this._pieceHeight
     );
   }
@@ -253,7 +253,7 @@ export class SPiece extends TetrisPiece {
     return (
       xCoordinates >= 0 &&
       xCoordinates - thirdWidth <= this._canvas.width - this._pieceWidth &&
-      yCoordinates >= 0 &&
+      yCoordinates >= this._canvas!.gridUnit * -2  &&
       yCoordinates <= this._canvas.height - this._pieceHeight
     );
   }

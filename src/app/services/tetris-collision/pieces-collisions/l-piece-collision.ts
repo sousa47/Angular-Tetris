@@ -1,31 +1,6 @@
 import { TetrisPiece } from 'src/app/models/pieces/tetris-piece';
 
 export class LPieceCollision {
-  private static pieceToBoardLogic: Record<
-    number,
-    (currentBoard: number[][], x: number, y: number) => number[][]
-  > = {
-    0: this.addPieceAt0Degrees,
-    90: this.addPieceAt90Degrees,
-    180: this.addPieceAt180Degrees,
-    270: this.addPieceAt270Degrees,
-  };
-
-  private static checkCollisionLogic: Record<
-    number,
-    (
-      currentBoard: number[][],
-      x: number,
-      y: number,
-      direction: 'down' | 'left' | 'right'
-    ) => boolean
-  > = {
-    0: this.checkCollisionAt0Degrees,
-    90: this.checkCollisionAt90Degrees,
-    180: this.checkCollisionAt180Degrees,
-    270: this.checkCollisionAt270Degrees,
-  };
-
   public static addPieceToBoard(
     currentBoard: number[][],
     x: number,
@@ -60,9 +35,9 @@ export class LPieceCollision {
     y: number
   ): number[][] {
     currentBoard[x][y] = 1;
+    currentBoard[x + 1][y] = 1;
     currentBoard[x + 1][y - 1] = 1;
     currentBoard[x + 1][y - 2] = 1;
-    currentBoard[x + 1][y - 3] = 1;
 
     return currentBoard;
   }
@@ -99,9 +74,9 @@ export class LPieceCollision {
     y: number
   ): number[][] {
     currentBoard[x][y] = 1;
-    currentBoard[x + 1][y] = 1;
-    currentBoard[x + 2][y] = 1;
-    currentBoard[x + 2][y - 1] = 1;
+    currentBoard[x][y + 1] = 1;
+    currentBoard[x + 1][y + 1] = 1;
+    currentBoard[x + 2][y + 1] = 1;
 
     return currentBoard;
   }
@@ -122,7 +97,7 @@ export class LPieceCollision {
           );
         case 'left':
           return (
-            currentBoard[x + 1][y - 3] === 1 || currentBoard[x][y - 1] === 1
+            currentBoard[x][y - 1] === 1 || currentBoard[x + 1][y - 3] === 1
           );
         case 'right':
           return (
@@ -154,9 +129,9 @@ export class LPieceCollision {
           );
         case 'right':
           return (
-            currentBoard[x + 2][y + 2] === 1 ||
             currentBoard[x][y + 1] === 1 ||
-            currentBoard[x + 1][y + 1] === 1
+            currentBoard[x + 1][y + 1] === 1 ||
+            currentBoard[x + 2][y + 2] === 1
           );
       }
     } catch {
@@ -174,9 +149,9 @@ export class LPieceCollision {
       switch (direction) {
         case 'down':
           return (
+            currentBoard[x + 2][y] === 1 ||
             currentBoard[x + 1][y + 1] === 1 ||
-            currentBoard[x + 1][y + 2] === 1 ||
-            currentBoard[x + 2][y] === 1
+            currentBoard[x + 1][y + 2] === 1
           );
         case 'left':
           return (
@@ -201,7 +176,9 @@ export class LPieceCollision {
     try {
       switch (direction) {
         case 'down':
-          return currentBoard[x + 3][y] === 1 || currentBoard[x][y - 1] === 1;
+          return (
+            currentBoard[x + 1][y - 1] === 1 || currentBoard[x + 3][y] === 1
+          );
         case 'left':
           return (
             currentBoard[x][y - 2] === 1 ||
@@ -219,4 +196,29 @@ export class LPieceCollision {
       return true;
     }
   }
+
+  private static pieceToBoardLogic: Record<
+    number,
+    (currentBoard: number[][], x: number, y: number) => number[][]
+  > = {
+    0: this.addPieceAt0Degrees,
+    90: this.addPieceAt90Degrees,
+    180: this.addPieceAt180Degrees,
+    270: this.addPieceAt270Degrees,
+  };
+
+  private static checkCollisionLogic: Record<
+    number,
+    (
+      currentBoard: number[][],
+      x: number,
+      y: number,
+      direction: 'down' | 'left' | 'right'
+    ) => boolean
+  > = {
+    0: this.checkCollisionAt0Degrees,
+    90: this.checkCollisionAt90Degrees,
+    180: this.checkCollisionAt180Degrees,
+    270: this.checkCollisionAt270Degrees,
+  };
 }

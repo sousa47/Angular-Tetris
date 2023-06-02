@@ -35,7 +35,7 @@ export class ZPiece extends TetrisPiece {
     if (rotationLogicFunction) context = rotationLogicFunction(context);
     return context;
   }
-  
+
   public override rotatePiece(
     context: CanvasRenderingContext2D
   ): CanvasRenderingContext2D {
@@ -90,7 +90,8 @@ export class ZPiece extends TetrisPiece {
 
     this.checkRotationNewXCoordinates(newXCoordinates);
 
-    if (newYCoordinates < 0) newYCoordinates = 0;
+    if (newYCoordinates < this._canvas!.gridUnit * -2)
+      newYCoordinates = this._canvas!.gridUnit * -2;
     if (newYCoordinates > canvasHeight - this._pieceWidth)
       newYCoordinates = canvasHeight - this._pieceWidth;
 
@@ -239,7 +240,7 @@ export class ZPiece extends TetrisPiece {
     return (
       xCoordinates >= 0 &&
       xCoordinates <= this._canvas.width - this._pieceWidth &&
-      yCoordinates >= 0 &&
+      yCoordinates >= this._canvas!.gridUnit * -2  &&
       yCoordinates <= this._canvas.height - this._pieceHeight
     );
   }
@@ -253,7 +254,7 @@ export class ZPiece extends TetrisPiece {
     return (
       xCoordinates >= halfWidth &&
       xCoordinates - halfWidth <= this._canvas.width - this._pieceWidth &&
-      yCoordinates >= 0 &&
+      yCoordinates >= this._canvas!.gridUnit * -2  &&
       yCoordinates <= this._canvas.height - this._pieceHeight
     );
   }

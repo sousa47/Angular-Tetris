@@ -41,36 +41,43 @@ export class TetrisPieceObjectService {
 
   public get IPiece(): TetrisPiece {
     this.createIPiece();
+    this._tetrisPieces[PieceIndex.IPiece].currentRotationDegree = 0;
     return this._tetrisPieces[PieceIndex.IPiece];
   }
 
   public get JPiece(): TetrisPiece {
     this.createJPiece();
+    this._tetrisPieces[PieceIndex.JPiece].currentRotationDegree = 0;
     return this._tetrisPieces[PieceIndex.JPiece];
   }
 
   public get LPiece(): TetrisPiece {
     this.createLPiece();
+    this._tetrisPieces[PieceIndex.LPiece].currentRotationDegree = 0;
     return this._tetrisPieces[PieceIndex.LPiece];
   }
 
   public get OPiece(): TetrisPiece {
     this.createOPiece();
+    this._tetrisPieces[PieceIndex.OPiece].currentRotationDegree = 0;
     return this._tetrisPieces[PieceIndex.OPiece];
   }
 
   public get SPiece(): TetrisPiece {
     this.createSPiece();
+    this._tetrisPieces[PieceIndex.SPiece].currentRotationDegree = 0;
     return this._tetrisPieces[PieceIndex.SPiece];
   }
 
   public get TPiece(): TetrisPiece {
     this.createTPiece();
+    this._tetrisPieces[PieceIndex.TPiece].currentRotationDegree = 0;
     return this._tetrisPieces[PieceIndex.TPiece];
   }
 
   public get ZPiece(): TetrisPiece {
     this.createZPiece();
+    this._tetrisPieces[PieceIndex.ZPiece].currentRotationDegree = 0;
     return this._tetrisPieces[PieceIndex.ZPiece];
   }
 
@@ -89,7 +96,7 @@ export class TetrisPieceObjectService {
     if (this.checkIfPieceExists(PieceIndex.IPiece)) return;
     var linePiece = new IPiece(
       this.getCanvas.xSpawn,
-      0,
+      this.getCanvas.ySpawn,
       'lightblue',
       this.getCanvas!
     );
@@ -102,7 +109,7 @@ export class TetrisPieceObjectService {
     if (this.checkIfPieceExists(PieceIndex.JPiece)) return;
     var jPiece = new JPiece(
       this.getCanvas.xSpawn - this.getCanvas.gridUnit,
-      0,
+      this.getCanvas.ySpawn,
       'blue',
       this.getCanvas!
     );
@@ -115,7 +122,7 @@ export class TetrisPieceObjectService {
     if (this.checkIfPieceExists(PieceIndex.LPiece)) return;
     var lPiece = new LPiece(
       this.getCanvas.xSpawn + this.getCanvas.gridUnit,
-      0,
+      this.getCanvas.ySpawn,
       'orange',
       this.getCanvas!
     );
@@ -128,7 +135,7 @@ export class TetrisPieceObjectService {
     if (this.checkIfPieceExists(PieceIndex.OPiece)) return;
     var squarePiece = new OPiece(
       this.getCanvas.xSpawn,
-      0,
+      this.getCanvas.ySpawn,
       'yellow',
       this.getCanvas!
     );
@@ -139,7 +146,12 @@ export class TetrisPieceObjectService {
   private createSPiece(): void {
     this.checkIfCanvasNotExists();
     if (this.checkIfPieceExists(PieceIndex.SPiece)) return;
-    var sPiece = new SPiece(this.getCanvas.xSpawn, 0, 'green', this.getCanvas!);
+    var sPiece = new SPiece(
+      this.getCanvas.xSpawn,
+      this.getCanvas.ySpawn,
+      'green',
+      this.getCanvas!
+    );
     sPiece.movement = this.getCanvas.gridUnit;
     this._tetrisPieces[PieceIndex.SPiece] = sPiece;
   }
@@ -149,7 +161,7 @@ export class TetrisPieceObjectService {
     if (this.checkIfPieceExists(PieceIndex.TPiece)) return;
     var tPiece = new TPiece(
       this.getCanvas.xSpawn,
-      0,
+      this.getCanvas.ySpawn,
       'purple',
       this.getCanvas!
     );
@@ -160,7 +172,12 @@ export class TetrisPieceObjectService {
   private createZPiece(): void {
     this.checkIfCanvasNotExists();
     if (this.checkIfPieceExists(PieceIndex.ZPiece)) return;
-    var zPiece = new ZPiece(this.getCanvas.xSpawn, 0, 'red', this.getCanvas!);
+    var zPiece = new ZPiece(
+      this.getCanvas.xSpawn,
+      this.getCanvas.ySpawn,
+      'red',
+      this.getCanvas!
+    );
     zPiece.movement = this.getCanvas.gridUnit;
     this._tetrisPieces[PieceIndex.ZPiece] = zPiece;
   }

@@ -1,31 +1,6 @@
 import { TetrisPiece } from 'src/app/models/pieces/tetris-piece';
 
 export class JPieceCollision {
-  private static pieceToBoardLogic: Record<
-    number,
-    (currentBoard: number[][], x: number, y: number) => number[][]
-  > = {
-    0: this.addPieceAt0Degrees,
-    90: this.addPieceAt90Degrees,
-    180: this.addPieceAt180Degrees,
-    270: this.addPieceAt270Degrees,
-  };
-
-  private static checkCollisionLogic: Record<
-    number,
-    (
-      currentBoard: number[][],
-      x: number,
-      y: number,
-      direction: 'down' | 'left' | 'right'
-    ) => boolean
-  > = {
-    0: this.checkCollisionAt0Degrees,
-    90: this.checkCollisionAt90Degrees,
-    180: this.checkCollisionAt180Degrees,
-    270: this.checkCollisionAt270Degrees,
-  };
-
   public static addPieceToBoard(
     currentBoard: number[][],
     x: number,
@@ -98,10 +73,10 @@ export class JPieceCollision {
     x: number,
     y: number
   ): number[][] {
-    currentBoard[x][y] = 1;
     currentBoard[x][y + 1] = 1;
     currentBoard[x + 1][y + 1] = 1;
     currentBoard[x + 2][y + 1] = 1;
+    currentBoard[x + 2][y] = 1;
 
     return currentBoard;
   }
@@ -122,7 +97,7 @@ export class JPieceCollision {
           );
         case 'left':
           return (
-            currentBoard[x + 1][y - 1] === 1 || currentBoard[x][y - 1] === 1
+            currentBoard[x][y - 1] === 1 || currentBoard[x + 1][y - 1] === 1
           );
         case 'right':
           return (
@@ -143,7 +118,9 @@ export class JPieceCollision {
     try {
       switch (direction) {
         case 'down':
-          return currentBoard[x + 3][y] === 1 || currentBoard[x][y + 1] === 1;
+          return (
+            currentBoard[x + 3][y] === 1 || currentBoard[x + 1][y + 1] === 1
+          );
         case 'left':
           return (
             currentBoard[x][y - 1] === 1 ||
@@ -152,9 +129,9 @@ export class JPieceCollision {
           );
         case 'right':
           return (
-            currentBoard[x + 2][y] === 1 ||
+            currentBoard[x][y + 2] === 1 ||
             currentBoard[x + 1][y + 1] === 1 ||
-            currentBoard[x + 1][y + 1] === 1
+            currentBoard[x + 2][y + 1] === 1
           );
       }
     } catch {
@@ -178,7 +155,7 @@ export class JPieceCollision {
           );
         case 'left':
           return (
-            currentBoard[x][y - 1] === 1 || currentBoard[x + 1][y + 1] === 1
+            currentBoard[x][y - 1] === 1 || currentBoard[x + 1][y - 1] === 1
           );
         case 'right':
           return (
@@ -200,23 +177,48 @@ export class JPieceCollision {
       switch (direction) {
         case 'down':
           return (
-            currentBoard[x + 1][y] === 1 || currentBoard[x + 3][y + 1] === 1
+            currentBoard[x + 3][y] === 1 || currentBoard[x + 3][y - 1] === 1
           );
         case 'left':
           return (
-            currentBoard[x][y - 2] === 1 ||
+            currentBoard[x][y - 1] === 1 ||
             currentBoard[x + 1][y - 1] === 1 ||
-            currentBoard[x + 2][y - 1] === 1
+            currentBoard[x + 2][y - 2] === 1
           );
         case 'right':
           return (
-            currentBoard[x][y + 2] === 1 ||
-            currentBoard[x + 1][y + 2] === 1 ||
-            currentBoard[x + 2][y + 2] === 1
+            currentBoard[x][y + 1] === 1 ||
+            currentBoard[x + 1][y + 1] === 1 ||
+            currentBoard[x + 2][y + 1] === 1
           );
       }
     } catch {
       return true;
     }
   }
+
+  private static pieceToBoardLogic: Record<
+    number,
+    (currentBoard: number[][], x: number, y: number) => number[][]
+  > = {
+    0: this.addPieceAt0Degrees,
+    90: this.addPieceAt90Degrees,
+    180: this.addPieceAt180Degrees,
+    270: this.addPieceAt270Degrees,
+  };
+
+  private static checkCollisionLogic: Record<
+    number,
+    (
+      currentBoard: number[][],
+      x: number,
+      y: number,
+      direction: 'down' | 'left' | 'right'
+    ) => boolean
+  > = {
+    0: this.checkCollisionAt0Degrees,
+    90: this.checkCollisionAt90Degrees,
+    180: this.checkCollisionAt180Degrees,
+    270: this.checkCollisionAt270Degrees,
+  };
 }
