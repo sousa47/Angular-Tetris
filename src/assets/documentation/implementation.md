@@ -2,6 +2,12 @@
 
 ## Contents
 
+1. [Introduction](#introduction)
+2. [Components](#components)
+    1. [Main Game Component](#main-game-component)
+    2. [Next Piece Component](#next-piece-component)
+    3. [Hold Piece Component](#hold-piece-component)
+
 ### Introduction
 
 In this document we will go through the implementation of the Angular Tetris game. We will go through the different components and services that make up the game and how they interact with each other. We will do these folder by folder, explaining the folder content and how it is used in the game.
@@ -10,6 +16,8 @@ Some pieces of the code will be shown here, which can be found in the `src\app` 
 ### Components
 
 The project contains 4 components, which are the following:
+
+#### Main Game Component
 
 - `main-game.component.ts` | [Open File](../../app/components/main-game/main-game.component.ts) - The main game component has the main canvas, which is the one in the middle. In this canvas the pieces that the player controls are drawn, as well as the grid and the next piece.
   To detect the keyboard events, the `HostListener` decorator is used, which allows to listen to events on the host element of the component, which in this case is the canvas. The `keydown` event is used to detect when the user presses a key, and the `keyup` event is used to prevent the user from holding down the key and moving the piece too fast. To know which method to be called based on the key pressed, a ``Record` is used, which is basically a `switch statement`. The `Record` is defined as follows:
@@ -105,7 +113,8 @@ public movePieceRight(): void {
     if (this.checkCollision('right')) return;
     this._currentPiece!.movePieceRight(this._canvasContext!) || null;
 }
-
+```
+```typescript
 private checkCollision(direction: 'down' | 'left' | 'right'): boolean {
     return this._tetrisCollisionService.checkCollision(
       this._currentPiece?.xCoordinates!,
@@ -146,21 +155,21 @@ The `ngAfterViewInit()` method is called after the view is initialized, and it i
 The following method is to hold the current piece, which could be one of the methods to improve the modularity of the component, but it works as it is:
 
 ```typescript
-  public holdCurrentPiece(): void {
-    if (!this._canHoldPiece || !this._currentPiece) return;
+public holdCurrentPiece(): void {
+  if (!this._canHoldPiece || !this._currentPiece) return;
 
-    const holdenPiece = this._observableTetrisPieceService.holdenTetrisPiece;
-    this._observableTetrisPieceService.holdenTetrisPiece = this._currentPiece!;
-    this._canHoldPiece = false;
+  const holdenPiece = this._observableTetrisPieceService.holdenTetrisPiece;
+  this._observableTetrisPieceService.holdenTetrisPiece = this._currentPiece!;
+  this._canHoldPiece = false;
 
-    if (holdenPiece) {
-      this._currentPiece.clearPiecePreviousPosition(this._canvasContext!);
-      this._currentPiece = holdenPiece;
-      this.drawPiece();
-    } else {
-      this.nextPiece(false);
-    }
+  if (holdenPiece) {
+    this._currentPiece.clearPiecePreviousPosition(this._canvasContext!);
+    this._currentPiece = holdenPiece;
+    this.drawPiece();
+  } else {
+    this.nextPiece(false);
   }
+}
 ```
 
 The `holdCurrentPiece()` method is called when the user presses the `f` key, and it holds the current piece, if possible, since the user can only hold the piece once per new piece. If the user holds the piece, the `holdenTetrisPiece` property of the `ObservableTetrisPieceService` is set to the current piece, and the `canHoldPiece` property of the component is set to `false`, so that the user cannot hold the piece again. If the user has already held a piece, then the current piece is set to the holden piece, and the holden piece is set to the current piece, and the `drawPiece()` method is called, which draws the piece on the canvas.
@@ -182,7 +191,8 @@ private startGameLoop(): void {
     }
   }, this._gameService.gameSpeed);
 }
-
+```
+```typescript
 private endGameLoop(): void {
     clearInterval(this._gameLoopInterval);
     this._gameLoopInterval = undefined;
@@ -223,3 +233,99 @@ private clearLines(lines: number[]): void {
 It checks how many lines were cleared, and then it clears the lines, and adds the score to the game. The `clearRect()` method is used to clear the lines, and the `drawImage()` method is used to draw the canvas again, but translated by the number of lines that were cleared, so that the pieces that were above the cleared lines are moved down.
 
 This method is called using one of the observables of the `ObservableTetrisPieceService`, which is the `linesCleared` observable.
+
+The other two `components` are a lot more simple, either way let's go over them.
+
+#### Hold Piece Component
+
+- `hold-piece.component.ts` | [Open File](../../app/components/hold-piece/hold-piece.component.ts) - The `HoldPieceComponent` is the component that holds the piece that the user has held, and it is used to display the piece that the user has held, on the left canvas. It has the same concepts has the previous component, but it is a lot more simple. It initializes the services on the constructor, subscribes to the `holdenTetrisPiece` property of the `ObservableTetrisPieceService` to check when a new piece was holdenm and uses the `ngAfterViewInit()` method to initialize the canvas.
+
+This component only has two methods, besides of the `ngAfterViewInit()` method, which are the following:
+
+```typescript
+private holdPiece(pieceToHold: TetrisPiece): void {
+  const holdenPiece = this._currentHoldPiece;
+  this._currentHoldPiece = pieceToHold;
+  
+  this.postionPiece();
+  this._canvasContext = this._tetrisPieceDrawingService.getPieceDrawing(
+    this._canvasContext!,
+    this._currentHoldPiece!
+  );
+
+  if (holdenPiece)
+    this._observableTetrisPieceService.currentTetrisPiece = holdenPiece;
+}
+```
+```typescript
+private postionPiece(): void {
+  this._canvasContext!.clearRect(0, 0, 2000, 2000);
+  this._currentHoldPiece!.movePiece(this._canvasContext!, 0, 0);
+  const setPieceCenterFunction =
+    this._currentHoldPiece!.constructor.name === 'TPiece' ||
+    this._currentHoldPiece!.constructor.name === 'SPiece'
+      ? () => {
+          this._currentHoldPiece!.movePieceLeft(this._canvasContext!);
+        }
+      : () => {
+          this._currentHoldPiece!.movePieceRight(this._canvasContext!);
+        };
+  for (let i = 0; i < 2; i++) setPieceCenterFunction();
+  this._currentHoldPiece!.movePieceDown(this._canvasContext!);
+  this._currentHoldPiece!.movePieceDown(this._canvasContext!);
+}
+```
+
+The `holdPiece()` method is called when the `holdenTetrisPiece` property of the `ObservableTetrisPieceService` is changed, and it holds the piece that was passed as a parameter, and sets the `currentHoldPiece` property of the component to the piece that was passed as a parameter. It then positions the piece using the `postionPiece()` method, and then it draws the piece on the canvas using the `getPieceDrawing()` method of the `TetrisPieceDrawingService`.
+
+The last method is used because of the scale of the canvas and the pieces, the `2000` number used in the `clearRect()` method is used to clear the canvas fully, almost any number above the canvas size would work, but `2000` is used because it is a big number, and it is easy to remember.
+
+#### Next Pieces Component
+
+- `next-pieces.component.ts` | [Open File](../../app/components/next-pieces/next-pieces.component.ts) - This component is even simpler than the previous one, it is used to display the next pieces that will spawn, since it wasn't possible to have an working canvas with it so instead some images were used. This way this component has no methods, having only two properties and the contructor.
+
+```typescript
+public constructor(
+  _observableTetrisPieceService: ObservableTetrisPieceService,
+  _nextPiecesService: NextPiecesService
+) {
+  _nextPiecesService.setFirstNextPieces();
+  _observableTetrisPieceService.startGameSubject.subscribe(
+    (value: boolean) => {
+      if (value) {
+        this.nextPiecesImageSourceArray =
+          _nextPiecesService.nextPiecesImageSourceArray;
+      }
+    }
+  );
+  _observableTetrisPieceService.currentTetrisPieceSubject.subscribe
+    (value) => {
+      if (this._firstPiece) {
+        this._firstPiece = false;
+        return;
+      }
+      if (value === null) {
+        _nextPiecesService.setNextPiece();
+        this.nextPiecesImageSourceArray =
+          _nextPiecesService.nextPiecesImageSourceArray;
+      }
+    }
+  );
+}
+```
+
+The constructor initializes the services, and subscribes to the `startGameSubject` and `currentTetrisPieceSubject` observables of the `ObservableTetrisPieceService`. The `startGameSubject` observable is used to check when the game starts, and then it sets the `nextPiecesImageSourceArray` property of the component to the `nextPiecesImageSourceArray` property of the `NextPiecesService`. The `currentTetrisPieceSubject` observable is used to check when the current piece is set to `null`, which means that either the piece was placed on the board or it was the first swap, and then it sets the next piece using the `setNextPiece()` method of the `NextPiecesService`, and then it sets the `nextPiecesImageSourceArray` property of the component to the `nextPiecesImageSourceArray` property of the `NextPiecesService`.
+
+The `nextImagesSourceArray` property is used to display the next pieces, and it is used in the `next-pieces.component.html` file, which is the following:
+
+```html
+<div class="images-section">
+  <ul>
+    <li *ngFor="let piece of nextPiecesImageSourceArray">
+      <img [src]="piece" alt="next piece" class="next-piece-image"/>
+    </li>
+  </ul>
+<div>
+```
+
+So the component is a list of images, sets the next piece and nothing more.
