@@ -21,11 +21,12 @@ export class NextPiecesService {
   public setNextPiece(): string {
     const nextPieceImageSource: string = this.nextPiecesImageSources.shift()!;
     const nextPiece = nextPieceImageSource.split('/images/')[1];
-    this.nextPiecesImageSources.push(`../assets/images/${nextPiece}`);
+    this.nextPiecesImageSources.push(`../assets/images/${this.randomPiece()}`);
     return nextPiece;
   }
 
   private randomPiece(): string {
+    // To changes odds of certain pieces, change the number in the Math.random() * 7
     const randomNumber: number = Math.floor(Math.random() * 7);
     switch (randomNumber) {
       case 0:

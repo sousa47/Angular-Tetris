@@ -1,37 +1,7 @@
 import { Canvas } from '../../canvas';
-import { TetrisPiece, RotationDegree } from '../tetris-piece';
+import { RotationDegree, TetrisPiece } from '../tetris-piece';
 
 export class SPiece extends TetrisPiece {
-  private rotationDrawPieceLogic: Record<
-    RotationDegree,
-    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
-  > = {
-    [0]: this.drawSPieceAt00Or180DegreeRotation.bind(this),
-    [180]: this.drawSPieceAt00Or180DegreeRotation.bind(this),
-    [90]: this.drawSPieceAt90Or270DegreeRotation.bind(this),
-    [270]: this.drawSPieceAt90Or270DegreeRotation.bind(this),
-  };
-
-  private rotationClearPieceLogic: Record<
-    RotationDegree,
-    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
-  > = {
-    [0]: this.clearSPieceAt0Or180DegreeRotation.bind(this),
-    [180]: this.clearSPieceAt0Or180DegreeRotation.bind(this),
-    [90]: this.clearSPieceAt90Or270DegreeRotation.bind(this),
-    [270]: this.clearSPieceAt90Or270DegreeRotation.bind(this),
-  };
-
-  private movePieceLogic: Record<
-    RotationDegree,
-    (xCoordinates: number, yCoordinates: number) => boolean
-  > = {
-    [0]: this.moveIsPossibleAt00Or180DegreeRotation.bind(this),
-    [180]: this.moveIsPossibleAt00Or180DegreeRotation.bind(this),
-    [90]: this.moveIsPossibleAt90Or270DegreeRotation.bind(this),
-    [270]: this.moveIsPossibleAt90Or270DegreeRotation.bind(this),
-  };
-
   constructor(
     xCoordinates: number,
     yCoordinates: number,
@@ -39,7 +9,6 @@ export class SPiece extends TetrisPiece {
     canvas: Canvas
   ) {
     super(xCoordinates, yCoordinates, color, canvas);
-    this._rotationDegree = 0;
   }
 
   override drawPiece(
@@ -99,6 +68,31 @@ export class SPiece extends TetrisPiece {
 
     this.setRotationNewCoordinates(newXCoordinates, newYCoordinates);
     return this.drawPiece(context, this._pieceWidth, this._pieceHeight);
+  }
+
+  public override canMoveToCoordinates(
+    xCoordinates: number,
+    yCoordinates: number
+  ): boolean {
+    const rotationLogicFunction = this.movePieceLogic[this._rotationDegree];
+    if (rotationLogicFunction)
+      return rotationLogicFunction(xCoordinates, yCoordinates);
+    return false;
+  }
+
+  public override setRotationNewCoordinates(
+    newXCoordinates: number,
+    newYCoordinates: number
+  ): void {
+    const canvasHeight = this._canvas.height;
+
+    this.checkRotationNewXCoordinates(newXCoordinates);
+
+    if (newYCoordinates < 0) newYCoordinates = 0;
+    if (newYCoordinates > canvasHeight - this._pieceHeight)
+      newYCoordinates = canvasHeight - this._pieceHeight;
+
+    this.yCoordinates = newYCoordinates;
   }
 
   private drawSPieceAt00Or180DegreeRotation(
@@ -220,31 +214,6 @@ export class SPiece extends TetrisPiece {
     return context;
   }
 
-  public override canMoveToCoordinates(
-    xCoordinates: number,
-    yCoordinates: number
-  ): boolean {
-    const rotationLogicFunction = this.movePieceLogic[this._rotationDegree];
-    if (rotationLogicFunction)
-      return rotationLogicFunction(xCoordinates, yCoordinates);
-    return false;
-  }
-
-  public override setRotationNewCoordinates(
-    newXCoordinates: number,
-    newYCoordinates: number
-  ): void {
-    const canvasHeight = this._canvas.height;
-
-    this.checkRotationNewXCoordinates(newXCoordinates);
-
-    if (newYCoordinates < 0) newYCoordinates = 0;
-    if (newYCoordinates > canvasHeight - this._pieceHeight)
-      newYCoordinates = canvasHeight - this._pieceHeight;
-
-    this.yCoordinates = newYCoordinates;
-  }
-
   private checkRotationNewXCoordinates(newXCoordinates: number): void {
     const canvasWidth = this._canvas.canvas.width;
 
@@ -288,4 +257,34 @@ export class SPiece extends TetrisPiece {
       yCoordinates <= this._canvas.height - this._pieceHeight
     );
   }
+
+  private rotationDrawPieceLogic: Record<
+    RotationDegree,
+    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
+  > = {
+    [0]: this.drawSPieceAt00Or180DegreeRotation.bind(this),
+    [180]: this.drawSPieceAt00Or180DegreeRotation.bind(this),
+    [90]: this.drawSPieceAt90Or270DegreeRotation.bind(this),
+    [270]: this.drawSPieceAt90Or270DegreeRotation.bind(this),
+  };
+
+  private rotationClearPieceLogic: Record<
+    RotationDegree,
+    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
+  > = {
+    [0]: this.clearSPieceAt0Or180DegreeRotation.bind(this),
+    [180]: this.clearSPieceAt0Or180DegreeRotation.bind(this),
+    [90]: this.clearSPieceAt90Or270DegreeRotation.bind(this),
+    [270]: this.clearSPieceAt90Or270DegreeRotation.bind(this),
+  };
+
+  private movePieceLogic: Record<
+    RotationDegree,
+    (xCoordinates: number, yCoordinates: number) => boolean
+  > = {
+    [0]: this.moveIsPossibleAt00Or180DegreeRotation.bind(this),
+    [180]: this.moveIsPossibleAt00Or180DegreeRotation.bind(this),
+    [90]: this.moveIsPossibleAt90Or270DegreeRotation.bind(this),
+    [270]: this.moveIsPossibleAt90Or270DegreeRotation.bind(this),
+  };
 }

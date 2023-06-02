@@ -157,7 +157,7 @@ export class MainGameComponent implements AfterViewInit {
       this._currentPiece?.yCoordinates!,
       this._currentPiece!
     );
-    this._gameService.nextPiece();
+    this._observableTetrisPieceService.currentTetrisPiece = null;
   }
 
   private checkIfPieceMoved(): boolean {
@@ -194,10 +194,12 @@ export class MainGameComponent implements AfterViewInit {
     }
 
     // move all lines above cleared lines down -> check this
+    /*
     this._canvasContext!.save();
     this._canvasContext!.translate(0, this._canvasGridUnit * numberOfLines);
     this._canvasContext!.drawImage(this._canvas?.canvas!, 0, 0);
     this._canvasContext!.restore();
+    */
 
     this._gameService.addScore(numberOfLines * numberOfLines);
   }

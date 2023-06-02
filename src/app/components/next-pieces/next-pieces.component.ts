@@ -10,6 +10,46 @@ import { TetrisPieceDrawingService } from 'src/app/services/tetris-piece/tetris-
 })
 export class NextPiecesComponent {
   public nextPiecesImageSourceArray: string[] | undefined;
+  private _firstPiece: boolean = true;
+
+  public constructor(
+    private _observableTetrisPieceService: ObservableTetrisPieceService,
+    private __tetrisPieceDrawingService: TetrisPieceDrawingService,
+    private _nextPiecesService: NextPiecesService
+  ) {
+    _nextPiecesService.setFirstNextPieces();
+    _observableTetrisPieceService.startGameSubject.subscribe(
+      (value: boolean) => {
+        if (value) {
+          this.nextPiecesImageSourceArray =
+            _nextPiecesService.nextPiecesImageSourceArray;
+        }
+      }
+    );
+
+    _observableTetrisPieceService.currentTetrisPieceSubject.subscribe(
+      (value) => {
+        if (this._firstPiece) {
+          this._firstPiece = false;
+          return;
+        }
+        
+        if (value === null) {
+          const nextPiece = _nextPiecesService.setNextPiece();
+          this.setNextPieceLogic[nextPiece]();
+          this.updateNextPiecesImageSourceArray();
+        }
+      }
+    );
+  }
+
+  private updateNextPiecesImageSourceArray(): void {
+    this.nextPiecesImageSourceArray = [];
+
+    this._nextPiecesService.nextPiecesImageSourceArray.forEach((value) => {
+      this.nextPiecesImageSourceArray!.push(value);
+    });
+  }
 
   private setNextPieceLogic: Record<string, () => void> = {
     ['IPiece']: () =>
@@ -34,32 +74,4 @@ export class NextPiecesComponent {
       (this._observableTetrisPieceService.currentTetrisPiece =
         this.__tetrisPieceDrawingService.tetrisPieceObjectService.ZPiece),
   };
-
-  constructor(
-    private _observableTetrisPieceService: ObservableTetrisPieceService,
-    private __tetrisPieceDrawingService: TetrisPieceDrawingService,
-    _nextPiecesService: NextPiecesService
-  ) {
-    _nextPiecesService.setFirstNextPieces();
-    _observableTetrisPieceService.startGameSubject.subscribe(
-      (value: boolean) => {
-        if (value) {
-          this.nextPiecesImageSourceArray =
-            _nextPiecesService.nextPiecesImageSourceArray;
-        }
-      }
-    );
-
-    _observableTetrisPieceService.currentTetrisPieceSubject.subscribe(
-      (value) => {
-        if (value === null) {
-          console.log(value);
-          const nextPiece = _nextPiecesService.setNextPiece();
-          this.setNextPieceLogic[nextPiece]();
-          this.nextPiecesImageSourceArray =
-            _nextPiecesService.nextPiecesImageSourceArray;
-        }
-      }
-    );
-  }
 }

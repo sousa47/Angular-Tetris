@@ -2,26 +2,6 @@ import { Canvas } from '../../canvas';
 import { TetrisPiece, RotationDegree } from '../tetris-piece';
 
 export class LPiece extends TetrisPiece {
-  private rotationDrawPieceLogic: Record<
-    RotationDegree,
-    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
-  > = {
-    [0]: this.drawLPieceAt0DegreeRotation.bind(this),
-    [90]: this.drawLPieceAt90DegreeRotation.bind(this),
-    [180]: this.drawLPieceAt180DegreeRotation.bind(this),
-    [270]: this.drawLPieceAt270DegreeRotation.bind(this),
-  };
-
-  private rotationClearPieceLogic: Record<
-    RotationDegree,
-    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
-  > = {
-    [0]: this.clearLPieceAt0DegreeRotation.bind(this),
-    [90]: this.clearLPieceAt90DegreeRotation.bind(this),
-    [180]: this.clearLPieceAt180DegreeRotation.bind(this),
-    [270]: this.clearLPieceAt270DegreeRotation.bind(this),
-  };
-
   public constructor(
     xCoordinates: number,
     yCoordinates: number,
@@ -29,7 +9,6 @@ export class LPiece extends TetrisPiece {
     canvas: Canvas
   ) {
     super(xCoordinates, yCoordinates, color, canvas);
-    this._rotationDegree = 0;
   }
 
   public override drawPiece(
@@ -349,4 +328,24 @@ export class LPiece extends TetrisPiece {
 
     return context;
   }
+
+  private rotationDrawPieceLogic: Record<
+    RotationDegree,
+    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
+  > = {
+    [0]: this.drawLPieceAt0DegreeRotation.bind(this),
+    [90]: this.drawLPieceAt90DegreeRotation.bind(this),
+    [180]: this.drawLPieceAt180DegreeRotation.bind(this),
+    [270]: this.drawLPieceAt270DegreeRotation.bind(this),
+  };
+
+  private rotationClearPieceLogic: Record<
+    RotationDegree,
+    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
+  > = {
+    [0]: this.clearLPieceAt0DegreeRotation.bind(this),
+    [90]: this.clearLPieceAt90DegreeRotation.bind(this),
+    [180]: this.clearLPieceAt180DegreeRotation.bind(this),
+    [270]: this.clearLPieceAt270DegreeRotation.bind(this),
+  };
 }

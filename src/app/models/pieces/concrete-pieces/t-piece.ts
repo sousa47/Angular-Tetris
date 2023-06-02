@@ -1,37 +1,7 @@
 import { Canvas } from '../../canvas';
-import { TetrisPiece, RotationDegree } from '../tetris-piece';
+import { RotationDegree, TetrisPiece } from '../tetris-piece';
 
 export class TPiece extends TetrisPiece {
-  private rotationDrawPieceLogic: Record<
-    RotationDegree,
-    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
-  > = {
-    [0]: this.drawHorizontalTPiece.bind(this),
-    [180]: this.drawHorizontalTPiece.bind(this),
-    [90]: this.drawVerticalTPiece.bind(this),
-    [270]: this.drawVerticalTPiece.bind(this),
-  };
-
-  private rotationClearPieceLogic: Record<
-    RotationDegree,
-    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
-  > = {
-    [0]: this.clearHorizontalTPiece.bind(this),
-    [180]: this.clearHorizontalTPiece.bind(this),
-    [90]: this.clearVerticalTPiece.bind(this),
-    [270]: this.clearVerticalTPiece.bind(this),
-  };
-
-  private movePieceLogic: Record<
-    RotationDegree,
-    (xCoordinates: number, yCoordinates: number) => boolean
-  > = {
-    [0]: this.moveIsPossibleTPieceUp.bind(this),
-    [180]: this.moveIsPossibleTPieceDown.bind(this),
-    [90]: this.moveIsPossibleTPieceRight.bind(this),
-    [270]: this.moveIsPossibleTPieceLeft.bind(this),
-  };
-
   public constructor(
     xCoordinates: number,
     yCoordinates: number,
@@ -39,7 +9,6 @@ export class TPiece extends TetrisPiece {
     canvas: Canvas
   ) {
     super(xCoordinates, yCoordinates, color, canvas);
-    this._rotationDegree = 0;
   }
 
   public override drawPiece(
@@ -99,6 +68,21 @@ export class TPiece extends TetrisPiece {
 
     this.setRotationNewCoordinates(newXCoordinates, newYCoordinates);
     return this.drawPiece(context, this._pieceWidth, this._pieceHeight);
+  }
+
+  public override setRotationNewCoordinates(
+    newXCoordinates: number,
+    newYCoordinates: number
+  ): void {
+    const canvasHeight = this._canvas!.canvas.height;
+
+    this.checkRotationNewXCoordinates(newXCoordinates);
+
+    if (newYCoordinates < 0) newYCoordinates = 0;
+    if (newYCoordinates > canvasHeight - this._pieceWidth)
+      newYCoordinates = canvasHeight - this._pieceWidth;
+
+    this.yCoordinates = newYCoordinates;
   }
 
   private isMiddlePieceUpOrRight(): boolean {
@@ -332,21 +316,6 @@ export class TPiece extends TetrisPiece {
     );
   }
 
-  public override setRotationNewCoordinates(
-    newXCoordinates: number,
-    newYCoordinates: number
-  ): void {
-    const canvasHeight = this._canvas!.canvas.height;
-
-    this.checkRotationNewXCoordinates(newXCoordinates);
-
-    if (newYCoordinates < 0) newYCoordinates = 0;
-    if (newYCoordinates > canvasHeight - this._pieceWidth)
-      newYCoordinates = canvasHeight - this._pieceWidth;
-
-    this.yCoordinates = newYCoordinates;
-  }
-
   private checkRotationNewXCoordinates(newXCoordinates: number): void {
     const halfWidth = this._pieceWidth / 2;
     const thirdWidth = this._pieceWidth / 3;
@@ -375,4 +344,34 @@ export class TPiece extends TetrisPiece {
 
     this.xCoordinates = newXCoordinates;
   }
+
+  private rotationDrawPieceLogic: Record<
+    RotationDegree,
+    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
+  > = {
+    [0]: this.drawHorizontalTPiece.bind(this),
+    [180]: this.drawHorizontalTPiece.bind(this),
+    [90]: this.drawVerticalTPiece.bind(this),
+    [270]: this.drawVerticalTPiece.bind(this),
+  };
+
+  private rotationClearPieceLogic: Record<
+    RotationDegree,
+    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
+  > = {
+    [0]: this.clearHorizontalTPiece.bind(this),
+    [180]: this.clearHorizontalTPiece.bind(this),
+    [90]: this.clearVerticalTPiece.bind(this),
+    [270]: this.clearVerticalTPiece.bind(this),
+  };
+
+  private movePieceLogic: Record<
+    RotationDegree,
+    (xCoordinates: number, yCoordinates: number) => boolean
+  > = {
+    [0]: this.moveIsPossibleTPieceUp.bind(this),
+    [180]: this.moveIsPossibleTPieceDown.bind(this),
+    [90]: this.moveIsPossibleTPieceRight.bind(this),
+    [270]: this.moveIsPossibleTPieceLeft.bind(this),
+  };
 }

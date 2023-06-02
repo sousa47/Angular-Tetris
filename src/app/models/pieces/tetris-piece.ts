@@ -72,6 +72,7 @@ export abstract class TetrisPiece implements TetrisInput {
     width: number,
     height: number
   ): CanvasRenderingContext2D {
+    // -1 and +2 to clear the border
     context.clearRect(
       xCoordinates - 1,
       yCoordinates - 1,
@@ -190,7 +191,7 @@ export abstract class TetrisPiece implements TetrisInput {
     this._context!.clearRect(0, 0, max, max);
   }
 
-  abstract clearPiecePreviousPosition(
+  public abstract clearPiecePreviousPosition(
     context: CanvasRenderingContext2D
   ): CanvasRenderingContext2D;
 

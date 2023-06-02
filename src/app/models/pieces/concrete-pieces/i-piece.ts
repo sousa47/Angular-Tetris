@@ -11,7 +11,6 @@ export class IPiece extends TetrisPiece {
     canvas: Canvas
   ) {
     super(xCoordinates, yCoordinates, color, canvas);
-    this._rotationDegree = 90;
   }
 
   public override drawPiece(

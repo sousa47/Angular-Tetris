@@ -2,25 +2,6 @@ import { Canvas } from '../../canvas';
 import { TetrisPiece, RotationDegree } from '../tetris-piece';
 
 export class JPiece extends TetrisPiece {
-  private rotationDrawPieceLogic: Record<
-    RotationDegree,
-    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
-  > = {
-    [0]: this.drawJPieceAt0DegreeRotation.bind(this),
-    [90]: this.drawJPieceAt90DegreeRotation.bind(this),
-    [180]: this.drawJPieceAt180DegreeRotation.bind(this),
-    [270]: this.drawJPieceAt270DegreeRotation.bind(this),
-  };
-  private rotationClearPieceLogic: Record<
-    RotationDegree,
-    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
-  > = {
-    [0]: this.clearJPieceAt0DegreeRotation.bind(this),
-    [90]: this.clearJPieceAt90DegreeRotation.bind(this),
-    [180]: this.clearJPieceAt180DegreeRotation.bind(this),
-    [270]: this.clearJPieceAt270DegreeRotation.bind(this),
-  };
-
   public constructor(
     xCoordinates: number,
     yCoordinates: number,
@@ -28,7 +9,6 @@ export class JPiece extends TetrisPiece {
     canvas: Canvas
   ) {
     super(xCoordinates, yCoordinates, color, canvas);
-    this._rotationDegree = 0;
   }
 
   public override drawPiece(
@@ -360,4 +340,23 @@ export class JPiece extends TetrisPiece {
 
     return context;
   }
+
+  private rotationDrawPieceLogic: Record<
+    RotationDegree,
+    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
+  > = {
+    [0]: this.drawJPieceAt0DegreeRotation.bind(this),
+    [90]: this.drawJPieceAt90DegreeRotation.bind(this),
+    [180]: this.drawJPieceAt180DegreeRotation.bind(this),
+    [270]: this.drawJPieceAt270DegreeRotation.bind(this),
+  };
+  private rotationClearPieceLogic: Record<
+    RotationDegree,
+    (context: CanvasRenderingContext2D) => CanvasRenderingContext2D
+  > = {
+    [0]: this.clearJPieceAt0DegreeRotation.bind(this),
+    [90]: this.clearJPieceAt90DegreeRotation.bind(this),
+    [180]: this.clearJPieceAt180DegreeRotation.bind(this),
+    [270]: this.clearJPieceAt270DegreeRotation.bind(this),
+  };
 }
