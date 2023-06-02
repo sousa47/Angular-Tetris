@@ -430,19 +430,32 @@ Besides of this methods there are also the ``getters`` and ``setters`` for the p
 
 First of all, let's see how each piece looks like and their names:
 
-- `I Piece` 
+- `I Piece`
+
 ![I Piece](../../assets/images/IPiece_image.png)
+
 - `J Piece`
+
 ![J Piece](../../assets/images/JPiece_image.png)
+
 - `L Piece` 
+
 ![L Piece](../../assets/images/LPiece_image.png)
+
 - `O Piece` 
+
 ![O Piece](../../assets/images/OPiece_image.png)
+
 - `S Piece` 
+
 ![S Piece](../../assets/images/SPiece_image.png)
+
 - `T Piece` 
+
 ![T Piece](../../assets/images/TPiece_image.png)
+
 - `Z Piece` 
+
 ![Z Piece](../../assets/images/ZPiece_image.png)
 
 The pieces are all very similar, they all have the same methods, but they have different implementations of the methods. We'll go through an overall of how the pieces are implemented, and then we'll go through some of them in more detail.
