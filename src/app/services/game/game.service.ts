@@ -26,7 +26,7 @@ export class GameService {
 
   public startGame(): void {
     this._observableTetrisPiece.startGame = true;
-    const startingPiece = this._tetrisPieceObjectService.JPiece;
+    const startingPiece = this._tetrisPieceObjectService.randomPiece;
     this._observableTetrisPiece.currentTetrisPiece = startingPiece;
   }
 

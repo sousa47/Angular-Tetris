@@ -5,6 +5,9 @@ import { OPieceCollision } from './pieces-collisions/o-piece-collision';
 import { IPieceCollision } from './pieces-collisions/i-piece-collision';
 import { LPieceCollision } from './pieces-collisions/l-piece-collision';
 import { JPieceCollision } from './pieces-collisions/j-piece-collision';
+import { SPieceCollision } from './pieces-collisions/s-piece-collision';
+import { TPieceCollision } from './pieces-collisions/t-piece-collision';
+import { ZPieceCollision } from './pieces-collisions/z-piece-collision';
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +28,12 @@ export class TetrisCollisionService {
       LPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
     ['OPiece']: (x, y, piece) =>
       OPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
+    ['SPiece']: (x, y, piece) =>
+      SPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
+    ['TPiece']: (x, y, piece) =>
+      TPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
+    ['ZPiece']: (x, y, piece) =>
+      ZPieceCollision.addPieceToBoard(this._tetrisBoard, x, y, piece),
   };
 
   private checkPieceForCollisionLogic: Record<
@@ -44,6 +53,12 @@ export class TetrisCollisionService {
       LPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
     ['OPiece']: (x, y, direction, piece) =>
       OPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
+    ['SPiece']: (x, y, direction, piece) =>
+      SPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
+    ['TPiece']: (x, y, direction, piece) =>
+      TPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
+    ['ZPiece']: (x, y, direction, piece) =>
+      ZPieceCollision.checkCollision(this._tetrisBoard, x, y, direction, piece),
   };
 
   constructor(
