@@ -96,7 +96,7 @@ export class TPiece extends TetrisPiece {
     const thirdWidth = this._pieceWidth / 3;
 
     if (this.isMiddlePieceUpOrRight()) {
-      context = this.drawPieceAndOuterBorder(
+      context = this.drawPieceAndBorder(
         context,
         this.xCoordinates - halfHeight,
         this.yCoordinates + halfHeight,
@@ -104,7 +104,7 @@ export class TPiece extends TetrisPiece {
         halfHeight
       );
 
-      context = this.drawPieceAndOuterBorder(
+      context = this.drawPieceAndBorder(
         context,
         this.xCoordinates,
         this.yCoordinates,
@@ -112,7 +112,7 @@ export class TPiece extends TetrisPiece {
         halfHeight
       );
     } else {
-      context = this.drawPieceAndOuterBorder(
+      context = this.drawPieceAndBorder(
         context,
         this.xCoordinates,
         this.yCoordinates,
@@ -120,7 +120,7 @@ export class TPiece extends TetrisPiece {
         halfHeight
       );
 
-      context = this.drawPieceAndOuterBorder(
+      context = this.drawPieceAndBorder(
         context,
         this.xCoordinates + halfHeight,
         this.yCoordinates + halfHeight,
@@ -183,7 +183,7 @@ export class TPiece extends TetrisPiece {
     const thirdHeight = this._pieceHeight / 3;
     const middlePieceDirection = this.isMiddlePieceUpOrRight() ? 1 : -1;
 
-    context = this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndBorder(
       context,
       this.xCoordinates,
       this.yCoordinates,
@@ -191,7 +191,7 @@ export class TPiece extends TetrisPiece {
       this._pieceHeight
     );
 
-    context = this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndBorder(
       context,
       this.xCoordinates + halfWidth * middlePieceDirection,
       this.yCoordinates + thirdHeight,
@@ -240,7 +240,7 @@ export class TPiece extends TetrisPiece {
 
     if (horizontalTPiece) {
       if (this.isMiddlePieceUpOrRight()) {
-        context = this.drawPieceAndOuterBorder(
+        context = this.drawPieceAndBorder(
           context,
           this.xCoordinates,
           this.yCoordinates + halfHeight,
@@ -248,7 +248,7 @@ export class TPiece extends TetrisPiece {
           halfHeight
         );
       } else {
-        context = this.drawPieceAndOuterBorder(
+        context = this.drawPieceAndBorder(
           context,
           this.xCoordinates + thirdWidth,
           this.yCoordinates,
@@ -257,7 +257,7 @@ export class TPiece extends TetrisPiece {
         );
       }
     } else {
-      context = this.drawPieceAndOuterBorder(
+      context = this.drawPieceAndBorder(
         context,
         this.xCoordinates,
         this.yCoordinates + halfWidth,

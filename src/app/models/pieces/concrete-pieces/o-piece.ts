@@ -27,7 +27,7 @@ export class OPiece extends TetrisPiece {
     const squareYCoordinates =
       this.yCoordinates + (this._pieceHeight - squareSize) / 2;
 
-    context = this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndBorder(
       context,
       squareXCoordinates,
       squareYCoordinates,

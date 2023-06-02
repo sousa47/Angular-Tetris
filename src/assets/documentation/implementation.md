@@ -4,9 +4,14 @@
 
 1. [Introduction](#introduction)
 2. [Components](#components)
-    1. [Main Game Component](#main-game-component)
-    2. [Next Piece Component](#next-piece-component)
-    3. [Hold Piece Component](#hold-piece-component)
+   1. [Main Game Component](#main-game-component)
+   2. [Next Piece Component](#next-piece-component)
+   3. [Hold Piece Component](#hold-piece-component)
+3. [Models and Interfaces](#models-and-interfaces)
+    1. [Tetris Input Interface](#tetris-input-interface)
+    2. [Canvas Model](#canvas-model)
+    3. [Abstract Tetris Piece Model](#abstract-tetris-piece-model)
+    4. [Concrete Tetris Pieces Models](#concrete-tetris-pieces-models)
 
 ### Introduction
 
@@ -114,6 +119,7 @@ public movePieceRight(): void {
     this._currentPiece!.movePieceRight(this._canvasContext!) || null;
 }
 ```
+
 ```typescript
 private checkCollision(direction: 'down' | 'left' | 'right'): boolean {
     return this._tetrisCollisionService.checkCollision(
@@ -192,6 +198,7 @@ private startGameLoop(): void {
   }, this._gameService.gameSpeed);
 }
 ```
+
 ```typescript
 private endGameLoop(): void {
     clearInterval(this._gameLoopInterval);
@@ -205,7 +212,6 @@ Both methods should be easy to understand, the method to start the game loop use
 Inside the loop, the `movePieceDown()` method is called, which moves the piece down, and the `checkIfPieceMoved()` method is called, which checks if the piece has moved, and if it hasn't, then the `nextPiece()` method is called, which is the method that spawns the next piece. In case the piece hasn't moved and the `yCoordinates` property of the piece is `0`, then the `endGameLoop()` method is called, which ends the game loop. This is because if the piece hasn't moved and the `yCoordinates` property is `0`, then the piece is at the top of the canvas, and the game should end.
 
 In the `endGameLoop()` method, the `endGame()` method of the `GameService` is called, which is the method that ends the game. The `_gameLoopInterval` property is set to `undefined` so that the game loop can be started again.
-
 
 Finally, the last method to check is the `clearLines()` method, which is the following:
 
@@ -246,7 +252,7 @@ This component only has two methods, besides of the `ngAfterViewInit()` method, 
 private holdPiece(pieceToHold: TetrisPiece): void {
   const holdenPiece = this._currentHoldPiece;
   this._currentHoldPiece = pieceToHold;
-  
+
   this.postionPiece();
   this._canvasContext = this._tetrisPieceDrawingService.getPieceDrawing(
     this._canvasContext!,
@@ -257,6 +263,7 @@ private holdPiece(pieceToHold: TetrisPiece): void {
     this._observableTetrisPieceService.currentTetrisPiece = holdenPiece;
 }
 ```
+
 ```typescript
 private postionPiece(): void {
   this._canvasContext!.clearRect(0, 0, 2000, 2000);
@@ -322,10 +329,114 @@ The `nextImagesSourceArray` property is used to display the next pieces, and it 
 <div class="images-section">
   <ul>
     <li *ngFor="let piece of nextPiecesImageSourceArray">
-      <img [src]="piece" alt="next piece" class="next-piece-image"/>
+      <img [src]="piece" alt="next piece" class="next-piece-image" />
     </li>
   </ul>
-<div>
+  <div></div>
+</div>
 ```
 
 So the component is a list of images, sets the next piece and nothing more.
+
+### Models and Interfaces
+
+In this application there's essentially two models and one interface. The models are the `TetrisPiece` and `Canvas`, and the interface is the `TetrisInput` interface.
+
+We will start with the interface since it is the simplest one.
+
+#### Tetris Input Interface
+
+- `tetris-input.ts` | [Open File](../../app/interfaces/tetris-input.ts) - This interface is used to define the input that the user can use to play the game, and it is used in the `TetrisPiece` model, which is the following:
+
+```typescript
+export interface TetrisInput {
+  movement: number;
+  rotatePieceClockwise(context: CanvasRenderingContext2D): CanvasRenderingContext2D;
+  movePieceDown(context: CanvasRenderingContext2D, hardDrop: boolean): CanvasRenderingContext2D;
+  movePieceLeft(context: CanvasRenderingContext2D): CanvasRenderingContext2D;
+  movePieceRight(context: CanvasRenderingContext2D): CanvasRenderingContext2D;
+}
+```
+
+It's essentialy the base moves that the Tetris games allows the user to do on a tetris piece. The reason why there's a `CanvasRenderingContext2D` parameter on each method is because the context of the canvas is tricky to get, and it is easier to get it on the `TetrisPiece` model and then pass it as a parameter to the methods and received a new one. The `movement` property is used to check how much the piece moves, by default it should move one unit, which is the size of a block or a grid unit from the `Canvas`.
+
+#### Canvas Model
+
+- `canvas.ts` | [Open File](../../app/models/canvas.ts) - The canvas model is used mostly to prevent data clump, so a class was extracted. In this class, besides of the `getters` and `setters` for the properties, there's only one method, which is the `drawCanvasGrid()` method, which is the following:
+
+```typescript
+private drawCanvasGrid(): Node {
+  const step = this.gridUnit;
+
+  var canvasGridElement = document.createElement('canvas');
+  canvasGridElement.width = this.width;
+  canvasGridElement.height = this.height;
+
+  var canvasGrid = canvasGridElement.getContext('2d')!;
+  canvasGrid.beginPath();
+  for (var x = 0; x <= this.width; x += step) {
+    canvasGrid.moveTo(x, 0);
+    canvasGrid.lineTo(x, this.height);
+  }
+
+  canvasGrid.strokeStyle = 'rgba(300,300,300, 0.15)';
+  canvasGrid.lineWidth = 2;
+  canvasGrid.stroke();
+  canvasGrid.beginPath();
+
+  for (var y = 0; y <= this.height; y += step) {
+    canvasGrid.moveTo(0, y);
+    canvasGrid.lineTo(this.width, y);
+  }
+
+  canvasGrid.strokeStyle = 'rgba(300,300,300, 0.15)';
+  canvasGrid.lineWidth = 2;
+  canvasGrid.stroke();
+  return canvasGridElement;
+}
+```
+
+It essentially creates a canvas element, and then it draws the grid on it, adding this new element to the html parent element of the canvas. To manipulate the grid, this is the method to change, the `strokeStyle` and `lineWidth` properties can be changed to change the color and the width of the grid lines.
+
+#### Abstract Tetris Piece Model
+
+- `tetris-piece.ts` | [Open Folder](../../app/models/pieces/) - The tetris piece model is an absctraction of the tetris pieces, it is used to create the pieces, and it is used to move them. This is the part of the code which gets complicated to maintain, since it is a lot of code, mainly because the drawing and other functionalities require a lot of small methods. The concrete implementation of the tetris pieces are in the `tetris-pieces` folder, and the abstract class is in the `tetris-piece.ts` file.
+
+This model implements the `TetrisInput` interface and uses an enumerator to define the rotation of the pieces, starting at 0 and ending at 270.
+
+This class could be divided into two classes, one for the piece movement and one for the piece drawing, but since there would be a lot of code duplication, it was decided to keep it as one class.
+
+The methods to draw the pieces are the following:
+
+- `drawPiece()` - This method is used to draw the piece on the canvas, given a context and the dimensions of the piece. This method is `abstract`, so it is implemented on the concrete classes.
+- `drawPieceAndBorder()` - This method is used to draw the piece and the border of the piece, given a context and the dimensions of the piece. The border that is, by default drawn, is the outer border, but a inner border can be drawn by passing extra arguments to the method. This method is `protected`, so all the concrete classes can use it.
+- `clearPieceAndBorder()` - As it says, this method is used to clear the piece and the border of the piece, given a context and the dimensions of the piece. This method is `protected`, so all the concrete classes can use it. Some pieces `override` this method given their complexity.
+- `clearCanvas()` - Clears the canvas of where the piece is. This method is `public`, so it can be used outside of the class.
+- `clearPiecePreviousPosition()` - Clears the previous position of the piece. This method is `public`, so it can be used outside of the class. It's also `abstract`, so it is implemented on the concrete classes.
+
+The methods to move the pieces are more simple, since based on the movement to be done, the only change is where the piece is going to be drawn. So besides of the methods to move the piece, there's also a method to check if the piece can be moved and one to check the piece position after being rotated. The methods to move the pieces are the following:
+
+- `movePiece()` - This is the method that's called to move the piece, it receives a context, the coordinates to where the piece should be moved, and two booleans, one to check if the piece previous position should be cleared, and another to check if the piece should be drawn in the new position. This method is `public`, so it can be used outside of the class. All the methods that move the piece, `movePieceDown()`, `movePieceRight()` and `movePieceLeft()`, call this method.
+- `canMoveToCoordinates()` - This method is used to check if the piece can be moved to the new position, it receives the coordinates to where the piece should be moved. This method is `public`, so it can be used outside of the class. In case the piece can't be moved, iit sets the piece 
+to the maximum position it can be moved to.
+- `rotatePiece()` - This method is used by the method from the `tetris-input` interface to rotate the piece clockwise. It's in a separe method in case counter-clockwise rotation is implemented in the future. This method is `protected` and `abstract`, so it is implemented on the concrete classes.
+- `setRotationNewCoordinates()` - This method is used to check the piece position after being rotated, it receives the coordinates to where the piece should be moved after being rotated, it works similarly to the `canMoveToCoordinates()` method. This method is `public`, so it can be used outside of the class. In case the piece can't be moved, it sets the piece to the maximum position it can be moved to.
+
+Besides of this methods there are also the ``getters`` and ``setters`` for the properties of the class. Overall it seems simple at first but given the complexity of some pieces can be hard to maintain.
+
+#### Concrete Tetris Pieces Models
+
+- `concrete-pieces` | [Open Folder](../../app/models/pieces/concrete-pieces/) - The concrete tetris pieces models are the concrete implementation of the tetris pieces, they are used to create the pieces, and they are used to move them. This is the part of the code which gets complicated to maintain, since it is a lot of code, mainly because the drawing and other functionalities require a lot of small methods. The abstract class is in the `tetris-piece.ts` file.
+
+First of all, let's see how each piece looks like and their names:
+
+- `I Piece` - ![I Piece](../../assets/images/IPiece_image.png)
+- `J Piece` - ![J Piece](../../assets/images/JPiece_image.png)
+- `L Piece` - ![L Piece](../../assets/images/LPiece_image.png)
+- `O Piece` - ![O Piece](../../assets/images/OPiece_image.png)
+- `S Piece` - ![S Piece](../../assets/images/SPiece_image.png)
+- `T Piece` - ![T Piece](../../assets/images/TPiece_image.png)
+- `Z Piece` - ![Z Piece](../../assets/images/ZPiece_image.png)
+
+The pieces are all very similar, they all have the same methods, but they have different implementations of the methods. We'll go through an overall of how the pieces are implemented, and then we'll go through some of them in more detail.
+	

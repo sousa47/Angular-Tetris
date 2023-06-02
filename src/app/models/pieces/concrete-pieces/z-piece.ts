@@ -105,7 +105,7 @@ export class ZPiece extends TetrisPiece {
     const thirdWidth = this._pieceWidth / 3;
     const twoThirdsWidth = this._pieceWidth * (2 / 3);
 
-    context = this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndBorder(
       context,
       this.xCoordinates,
       this.yCoordinates,
@@ -117,7 +117,7 @@ export class ZPiece extends TetrisPiece {
       this.yCoordinates + halfHeight
     );
 
-    context = this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndBorder(
       context,
       this.xCoordinates + thirdWidth,
       this.yCoordinates + halfHeight,
@@ -164,7 +164,7 @@ export class ZPiece extends TetrisPiece {
     const thirdHeight = this._pieceHeight / 3;
     const twoThirdsHeight = this._pieceHeight * (2 / 3);
 
-    context = this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndBorder(
       context,
       this.xCoordinates,
       this.yCoordinates,
@@ -176,7 +176,7 @@ export class ZPiece extends TetrisPiece {
       this.yCoordinates + thirdHeight
     );
 
-    context = this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndBorder(
       context,
       this.xCoordinates - halfWidth,
       this.yCoordinates + thirdHeight,

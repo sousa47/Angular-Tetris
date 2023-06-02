@@ -37,7 +37,7 @@ export class IPiece extends TetrisPiece {
   ): CanvasRenderingContext2D {
     const sectionLength = this._pieceWidth / this._numberOfSections;
     for (let i = 0; i < this._numberOfSections; i++) {
-      context = this.drawPieceAndOuterBorder(
+      context = this.drawPieceAndBorder(
         context,
         this.xCoordinates + sectionLength * i,
         this.yCoordinates,
@@ -54,7 +54,7 @@ export class IPiece extends TetrisPiece {
   ): CanvasRenderingContext2D {
     const sectionLength = this._pieceHeight / this._numberOfSections;
     for (let i = 0; i < this._numberOfSections; i++) {
-      context = this.drawPieceAndOuterBorder(
+      context = this.drawPieceAndBorder(
         context,
         this.xCoordinates,
         this.yCoordinates + sectionLength * i,

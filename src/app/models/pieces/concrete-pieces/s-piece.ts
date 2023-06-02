@@ -103,7 +103,7 @@ export class SPiece extends TetrisPiece {
     const thirdWidth = this._pieceWidth / 3;
     const twoThirdsWidth = this._pieceWidth * (2 / 3);
 
-    context = this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndBorder(
       context,
       this.xCoordinates,
       this.yCoordinates,
@@ -115,7 +115,7 @@ export class SPiece extends TetrisPiece {
       this.yCoordinates + halfHeight
     );
 
-    context = this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndBorder(
       context,
       this.xCoordinates - thirdWidth,
       this.yCoordinates + halfHeight,
@@ -162,7 +162,7 @@ export class SPiece extends TetrisPiece {
     const twoThirdsHeight = (this._pieceHeight * 2) / 3;
     const thirdHeight = this._pieceHeight / 3;
 
-    context = this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndBorder(
       context,
       this.xCoordinates,
       this.yCoordinates,
@@ -174,7 +174,7 @@ export class SPiece extends TetrisPiece {
       this.yCoordinates + thirdHeight
     );
 
-    context = this.drawPieceAndOuterBorder(
+    context = this.drawPieceAndBorder(
       context,
       this.xCoordinates + halfWidth,
       this.yCoordinates + thirdHeight,

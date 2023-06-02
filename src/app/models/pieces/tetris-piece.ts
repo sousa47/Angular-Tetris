@@ -36,7 +36,7 @@ export abstract class TetrisPiece implements TetrisInput {
     widthLength: number
   ): CanvasRenderingContext2D;
 
-  protected drawPieceAndOuterBorder(
+  protected drawPieceAndBorder(
     context: CanvasRenderingContext2D,
     xCoordinates: number,
     yCoordinates: number,
@@ -81,6 +81,16 @@ export abstract class TetrisPiece implements TetrisInput {
     );
     return context;
   }
+
+  public clearCanvas(): void {
+    const max = Number.MAX_SAFE_INTEGER;
+    this._context!.clearRect(0, 0, max, max);
+  }
+
+  public abstract clearPiecePreviousPosition(
+    context: CanvasRenderingContext2D
+  ): CanvasRenderingContext2D;
+
 
   public movePieceDown(
     context: CanvasRenderingContext2D,
@@ -186,15 +196,6 @@ export abstract class TetrisPiece implements TetrisInput {
     this.xCoordinates = newXCoordinates;
     this.yCoordinates = newYCoordinates;
   }
-
-  public clearCanvas(): void {
-    const max = Number.MAX_SAFE_INTEGER;
-    this._context!.clearRect(0, 0, max, max);
-  }
-
-  public abstract clearPiecePreviousPosition(
-    context: CanvasRenderingContext2D
-  ): CanvasRenderingContext2D;
 
   public get xCoordinates(): number {
     return this._xCoordinates;
