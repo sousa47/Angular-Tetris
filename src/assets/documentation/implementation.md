@@ -12,6 +12,14 @@
     2. [Canvas Model](#canvas-model)
     3. [Abstract Tetris Piece Model](#abstract-tetris-piece-model)
     4. [Concrete Tetris Pieces Models](#concrete-tetris-pieces-models)
+4. [Services](#services)
+    1. [Game Service](#game-service)
+    2. [Next Pieces Service](#next-pieces-service)
+    3. [Observable Tetris Piece Service](#observable-tetris-piece-service)
+    4. [Tetris Collision Service](#tetris-collision-service)
+    5. [Tetris Piece Drawing Service](#tetris-piece-drawing-service)
+    6. [Tetris Piece Object Service](#tetris-piece-object-service)
+5. [Conclusion](#conclusion)
 
 ### Introduction
 
@@ -458,5 +466,21 @@ First of all, let's see how each piece looks like and their names:
 
 ![Z Piece](../../assets/images/ZPiece_image.png)
 
-The pieces are all very similar, they all have the same methods, but they have different implementations of the methods. We'll go through an overall of how the pieces are implemented, and then we'll go through some of them in more detail.
-	
+The pieces are all very similar, they all have the same methods, but they have different implementations of the methods. We'll go through an overall of how the pieces are implemented, and then we'll go through some of them in more detail. We will not cover the `OPiece` since it is the simplest piece, instead we will go through the `IPiece` and the `TPiece`.
+
+
+
+### Services
+#### Game Service
+
+#### Next Pieces Service
+
+#### Observable Tetris Piece Service
+
+#### Tetris Collision Service
+
+#### Tetris Piece Drawing Service
+
+#### Tetris Piece Object Service
+
+### Conclusion
