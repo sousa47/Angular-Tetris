@@ -40,6 +40,7 @@ export class TetrisCollisionService {
       piece
     );
     this.checkForLineClear();
+    // TODO: remove this
     console.log(this._tetrisBoard);
   }
 

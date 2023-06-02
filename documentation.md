@@ -1,10 +1,12 @@
 # Angular Tetris Documentation
 
-## Index
+## Contents
 
 1. [The Context](#the-context)
-2. [How It Was Done](#how-it-was-done)
-3. [Implementation Details]
+2. [How It Was Done](#2.how-it-was-done)
+2.1. [Services and Model Class's to Draw the Pieces](#services-and-model-classs-to-draw-the-pieces)
+2.2. [The other services](#the-other-services)
+3. [Implementation Details](#implementation-details)
 
 ### The Context
 

@@ -45,6 +45,8 @@ export class HoldPieceComponent implements AfterViewInit {
     const holdenPiece = this._currentHoldPiece;
     this._currentHoldPiece = pieceToHold;
 
+
+    // TODO: fix this -> it works (sometimes) but it's not the best way to do it
     this.postionPiece();
 
     this._canvasContext = this._tetrisPieceDrawingService.getPieceDrawing(

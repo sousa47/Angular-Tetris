@@ -20,15 +20,6 @@ import { TetrisCollisionService } from 'src/app/services/tetris-collision/tetris
 export class MainGameComponent implements AfterViewInit {
   @ViewChild('canvas', { static: true }) canvas!: ElementRef<HTMLCanvasElement>;
 
-  private inputLogic: Record<string, () => void> = {
-    ['a']: this.movePieceLeft.bind(this),
-    ['s']: this.movePieceDown.bind(this),
-    ['d']: this.movePieceRight.bind(this),
-    ['e']: this.rotatePiece.bind(this),
-    ['w']: this.movePieceDownhardDrop.bind(this),
-    ['f']: this.holdCurrentPiece.bind(this),
-  };
-
   private _currentPiece: TetrisPiece | null = null;
   private _canvasContext: CanvasRenderingContext2D | null = null;
   private _canHoldPiece: boolean = true;
@@ -116,7 +107,7 @@ export class MainGameComponent implements AfterViewInit {
   }
 
   public rotatePiece(): void {
-    // check collision before rotating
+    // TODO: check collision before rotating
     this._currentPiece!.rotatePieceClockwise(this._canvasContext!) || null;
   }
 
@@ -126,6 +117,8 @@ export class MainGameComponent implements AfterViewInit {
     const holdenPiece = this._observableTetrisPieceService.holdenTetrisPiece;
     this._observableTetrisPieceService.holdenTetrisPiece = this._currentPiece!;
     this._canHoldPiece = false;
+
+    // TODO: reset timer of game loop - to prevent piece from getting stuck in the top
 
     if (holdenPiece) {
       this._currentPiece.clearPiecePreviousPosition(this._canvasContext!);
@@ -214,13 +207,11 @@ export class MainGameComponent implements AfterViewInit {
       );
     }
 
-    // move all lines above cleared lines down -> check this
-    /*
+    // TODO: fix this -> drops the canvas down
     this._canvasContext!.save();
     this._canvasContext!.translate(0, this._canvasGridUnit * numberOfLines);
     this._canvasContext!.drawImage(this._canvas?.canvas!, 0, 0);
     this._canvasContext!.restore();
-    */
 
     this._gameService.addScore(numberOfLines * numberOfLines);
   }
@@ -231,4 +222,13 @@ export class MainGameComponent implements AfterViewInit {
     const inputLogicFuntion = this.inputLogic[event.key];
     if (inputLogicFuntion) inputLogicFuntion();
   }
+
+  private inputLogic: Record<string, () => void> = {
+    ['a']: this.movePieceLeft.bind(this),
+    ['s']: this.movePieceDown.bind(this),
+    ['d']: this.movePieceRight.bind(this),
+    ['e']: this.rotatePiece.bind(this),
+    ['w']: this.movePieceDownhardDrop.bind(this),
+    ['f']: this.holdCurrentPiece.bind(this),
+  };
 }
